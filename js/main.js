@@ -4,13 +4,13 @@
 
 /* ---------- Gallery data (caption + category) ---------- */
 const GALLERY = [
-  { src: "carnatic-concert-1.jpg",       cat: "performances", cap: "Carnatic vocal concert — a Tyagaraja kriti" },
+  { src: "carnatic-concert-1.jpg",       cat: "performances", cap: "Smt. Radha Sathyanarayanan in concert — a Tyagaraja kriti" },
   { src: "new-students-1.jpg",           cat: "kalaashaala",  cap: "Young students performing Bharatanatyam" },
   { src: "arun-carnatic.jpg",            cat: "performances", cap: "Carnatic vocal concert" },
   { src: "new-students-2.jpg",           cat: "kalaashaala",  cap: "Young students in performance" },
-  { src: "carnatic-concert-2.jpg",       cat: "performances", cap: "Carnatic vocal concert" },
+  { src: "carnatic-concert-2.jpg",       cat: "performances", cap: "Smt. Radha Sathyanarayanan in a Carnatic vocal concert" },
   { src: "new-student-yellow.jpg",       cat: "kalaashaala",  cap: "A young student of Kalaashaala" },
-  { src: "carnatic-vocal.jpg",           cat: "performances", cap: "Carnatic vocal performance" },
+  { src: "carnatic-vocal.jpg",           cat: "performances", cap: "Radhini Rao — Carnatic vocal performance" },
   { src: "new-felicitation.jpg",         cat: "kalaashaala",  cap: "Honouring guests at a Kalaashaala event" },
   { src: "radhini-arun.jpg",             cat: "performances", cap: "With Sri Arun Kumar Sathyanarayanan" },
   { src: "geetamahotsav.jpg",            cat: "performances", cap: "Geetamahotsav — curated by the Embassy of India, with the Indian Ambassador" },
