@@ -6,7 +6,7 @@
 const GALLERY = [
   { src: "carnatic-concert-1.jpg",       cat: "performances", cap: "Smt. Radha Sathyanarayanan in concert — a Tyagaraja kriti" },
   { src: "new-students-1.jpg",           cat: "kalaashaala",  cap: "Young students performing Bharatanatyam" },
-  { src: "arun-carnatic.jpg",            cat: "performances", cap: "Carnatic vocal concert" },
+  { src: "arun-carnatic.jpg",            cat: "performances", cap: "Sri Arun Kumar Sathyanarayanan in a Carnatic vocal concert" },
   { src: "new-students-2.jpg",           cat: "kalaashaala",  cap: "Young students in performance" },
   { src: "carnatic-concert-2.jpg",       cat: "performances", cap: "Smt. Radha Sathyanarayanan in a Carnatic vocal concert" },
   { src: "new-student-yellow.jpg",       cat: "kalaashaala",  cap: "A young student of Kalaashaala" },

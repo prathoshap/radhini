@@ -251,7 +251,7 @@ p{ margin:0 0 1.1rem; }
 .batch h3{ color:var(--plum); font-size:1.3rem; margin-bottom:.2rem; }
 .batch p{ margin:0; font-size:.92rem; color:var(--ink-soft); }
 .classes__media .about__frame{ box-shadow:var(--shadow); }
-.classes__media img{ width:100%; aspect-ratio:3/4; object-fit:cover; object-position:30% 50%; transition:transform 1.4s var(--ease); }
+.classes__media img{ width:100%; height:auto; display:block; transition:transform 1.4s var(--ease); }
 .classes__media:hover img{ transform:scale(1.05); }
 
 /* =========================================================
