@@ -363,6 +363,10 @@ a.ccard:hover{ background:rgba(255,255,255,.1); transform:translateY(-4px); }
   .nav.open{ transform:none; }
   .nav a{ color:var(--cream) !important; font-size:1rem; }
   .nav-toggle{ display:flex; }
+  /* When the menu is open the toggle sits on the plum panel, so keep the
+     bars light even when scrolled (otherwise the X is plum-on-plum and
+     vanishes at the bottom of the page). */
+  .nav-toggle.active span{ background:#fff; }
   .nav.open ~ .nav-toggle span,
   .nav-toggle.active span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
   .nav-toggle.active span:nth-child(2){ opacity:0; }
