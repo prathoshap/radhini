@@ -136,7 +136,7 @@ p{ margin:0 0 1.1rem; }
 
 .nav-toggle{
   display:none; flex-direction:column; gap:5px; background:none; border:0;
-  cursor:pointer; padding:6px; z-index:60;
+  cursor:pointer; padding:6px; position:relative; z-index:60;
 }
 .nav-toggle span{ width:26px; height:2px; background:#fff; transition:.35s var(--ease); }
 .scrolled .nav-toggle span{ background:var(--plum); }
