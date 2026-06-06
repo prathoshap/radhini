@@ -88,13 +88,22 @@ p{ margin:0 0 1.1rem; }
   position:fixed; inset:0 0 auto 0; z-index:50;
   display:flex; align-items:center; justify-content:space-between;
   padding:1.1rem clamp(1.2rem,4vw,2.6rem);
-  transition:background .45s var(--ease), padding .45s var(--ease), box-shadow .45s var(--ease);
+  transition:padding .45s var(--ease);
 }
-.site-header.scrolled{
+/* The scrolled backdrop lives on a pseudo-element rather than on the header
+   itself. backdrop-filter on the header would make it the containing block
+   for the fixed-position mobile nav, trapping the menu inside the header bar
+   (it would appear at the top and require scrolling up to see it). */
+.site-header::before{
+  content:""; position:absolute; inset:0; z-index:-1;
   background:rgba(250,244,238,.92);
   backdrop-filter:blur(10px);
-  padding:.6rem clamp(1.2rem,4vw,2.6rem);
   box-shadow:0 10px 30px -20px rgba(52,26,46,.5);
+  opacity:0; transition:opacity .45s var(--ease);
+}
+.site-header.scrolled::before{ opacity:1; }
+.site-header.scrolled{
+  padding:.6rem clamp(1.2rem,4vw,2.6rem);
 }
 .brand{ display:flex; align-items:center; gap:.7rem; }
 .brand__logo{
@@ -304,14 +313,14 @@ p{ margin:0 0 1.1rem; }
 .contact .kicker{ color:var(--gold-soft); }
 .contact__grid{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(2rem,5vw,4rem); align-items:center; }
 .contact__intro p{ color:rgba(250,244,238,.78); }
-.socials{ display:flex; gap:1rem; margin-top:1.4rem; }
+.socials{ display:flex; flex-wrap:wrap; gap:1rem; margin-top:1.4rem; }
 .social{ font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; padding:.6rem 1.4rem; border:1px solid rgba(230,207,154,.4); border-radius:2rem; transition:.35s var(--ease); }
 .social:hover{ background:var(--gold); color:var(--plum-deep); border-color:var(--gold); }
 .contact__cards{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
 .ccard{ background:rgba(255,255,255,.05); border:1px solid rgba(230,207,154,.18); border-radius:8px; padding:1.4rem 1.5rem; display:flex; flex-direction:column; gap:.4rem; transition:.4s var(--ease); }
 a.ccard:hover{ background:rgba(255,255,255,.1); transform:translateY(-4px); }
 .ccard__label{ font-size:.68rem; letter-spacing:.22em; text-transform:uppercase; color:var(--gold-soft); }
-.ccard__value{ font-family:var(--serif); font-size:1.2rem; color:#fff; }
+.ccard__value{ font-family:var(--serif); font-size:1.2rem; color:#fff; overflow-wrap:break-word; word-break:break-word; }
 .ccard--static{ opacity:.95; }
 
 /* =========================================================
