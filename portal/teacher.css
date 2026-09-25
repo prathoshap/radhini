@@ -1,0 +1,85 @@
+/* Teacher console — layout on top of portal.css */
+
+.console{
+  max-width:1240px; margin:0 auto; padding:22px;
+  display:grid; grid-template-columns:290px 1fr; gap:18px; align-items:start;
+}
+
+.roster{
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius);
+  padding:16px; position:sticky; top:82px;
+}
+.roster__head{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.roster__list{ list-style:none; margin:12px 0 0; padding:0; max-height:62vh; overflow-y:auto; }
+.roster__list li + li{ margin-top:4px; }
+.roster__list button{
+  width:100%; text-align:left; cursor:pointer; font-family:var(--sans);
+  border:1px solid transparent; background:none; border-radius:11px; padding:9px 11px;
+  display:flex; justify-content:space-between; align-items:center; gap:8px; color:var(--ink);
+}
+.roster__list button:hover{ background:var(--cream-2); }
+.roster__list button.is-active{ background:var(--plum); color:var(--cream); }
+.roster__list .nm{ font-size:.85rem; }
+.roster__list .pc{ font-size:.7rem; opacity:.7; font-variant-numeric:tabular-nums; }
+.roster__count{ margin:10px 0 0; font-size:.72rem; }
+
+.mini{
+  font-family:var(--sans); font-size:.76rem; color:var(--ink);
+  border:1px solid var(--line); border-radius:9px; padding:6px 9px; background:var(--white);
+}
+.search{ width:100%; margin-top:10px; }
+
+.detail .card{ margin-bottom:14px; }
+.detail__head{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; }
+
+.ms{ border:1px solid var(--line); border-radius:14px; margin-bottom:10px; overflow:hidden; }
+.ms__head{
+  display:flex; align-items:center; gap:12px; padding:12px 15px;
+  background:var(--cream-2); cursor:pointer;
+}
+.ms__head h4{ margin:0; font-family:var(--accent); font-weight:400; font-size:.94rem; color:var(--plum); flex:1; }
+.ms__pct{ font-size:.72rem; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+.ms__body{ padding:12px 15px; }
+
+.steprow{
+  display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center;
+  padding:8px 0; border-bottom:1px solid var(--cream-2);
+}
+.steprow:last-child{ border-bottom:0; }
+.steprow .sname{ font-size:.84rem; }
+.steprow select{ font-family:var(--sans); font-size:.75rem; padding:6px 9px; border:1px solid var(--line); border-radius:9px; background:var(--white); color:var(--ink); }
+.steprow select[data-status="complete"]{ border-color:var(--gold); background:var(--blush); }
+
+.formgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.field label{ display:block; font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:5px; }
+.field input, .field select, .field textarea{
+  width:100%; font-family:var(--sans); font-size:.85rem; color:var(--ink);
+  border:1px solid var(--line); border-radius:10px; padding:9px 11px; background:var(--white);
+}
+.field textarea{ min-height:76px; resize:vertical; }
+.btn--sm{ width:auto; margin-top:0; padding:10px 18px; font-size:.72rem; }
+.row-end{ display:flex; justify-content:flex-end; gap:9px; margin-top:12px; }
+
+.chips{ display:flex; flex-wrap:wrap; gap:7px; }
+.chip{
+  display:inline-flex; align-items:center; gap:6px; cursor:pointer;
+  border:1px solid var(--line); background:var(--white); border-radius:999px;
+  padding:7px 13px; font-family:var(--sans); font-size:.76rem; color:var(--ink);
+}
+.chip.is-on{ background:var(--blush); border-color:var(--gold); }
+
+.toast{
+  position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
+  background:var(--plum); color:var(--cream); padding:11px 20px; border-radius:11px;
+  font-size:.82rem; opacity:0; pointer-events:none; transition:opacity .22s, transform .22s;
+  z-index:50;
+}
+.toast.is-on{ opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.is-err{ background:#8a2b2b; }
+
+@media (max-width:900px){
+  .console{ grid-template-columns:1fr; }
+  .roster{ position:static; }
+  .roster__list{ max-height:none; }
+  .formgrid{ grid-template-columns:1fr; }
+}

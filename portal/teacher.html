@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Console — Kalaashaala</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/jpeg" href="../assets/img/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&family=Marcellus&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="teacher.css" />
+</head>
+<body>
+
+  <header class="p-header">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/logo.jpg" alt="" />
+      <span><b>Kalaashaala</b><span>Teacher Console</span></span>
+    </a>
+    <div class="right">
+      <a class="linkish" href="app.html">Student view</a>
+      <span id="whoami" class="muted" style="color:var(--gold-soft)"></span>
+      <button class="linkish" id="signOut">Sign out</button>
+    </div>
+  </header>
+
+  <main class="console" id="main" hidden>
+
+    <!-- ============ Roster ============ -->
+    <aside class="roster">
+      <div class="roster__head">
+        <h2 class="section-title" style="margin:0">Students</h2>
+        <select id="batchFilter" class="mini" aria-label="Filter by batch">
+          <option value="">All batches</option>
+        </select>
+      </div>
+      <input id="search" class="mini search" type="search" placeholder="Search by name…" aria-label="Search students" />
+      <ul class="roster__list" id="rosterList"></ul>
+      <p class="muted roster__count" id="rosterCount"></p>
+    </aside>
+
+    <!-- ============ Detail ============ -->
+    <section class="detail" id="detail">
+      <div class="card"><p class="empty">Choose a student from the list.</p></div>
+    </section>
+
+  </main>
+
+  <div class="wrap" id="loading"><p class="muted">Loading…</p></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="teacher.js"></script>
+</body>
+</html>

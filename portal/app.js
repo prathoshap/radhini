@@ -25,6 +25,11 @@ $('signOut').addEventListener('click', async () => {
   window.location.replace('index.html');
 });
 
+// Show the console link only to the instructor. Cosmetic only — the console
+// itself re-checks, and RLS refuses writes regardless of what the UI shows.
+sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle()
+  .then(({ data }) => { $('teacherLink').hidden = data?.role !== 'instructor'; });
+
 $('tabs').addEventListener('click', (e) => {
   const button = e.target.closest('button[data-panel]');
   if (!button) return;
