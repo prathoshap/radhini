@@ -24,15 +24,21 @@ Once signed in, the header has:
 
 ## Adding a new student
 
-1. **Students** → type the name, choose the batch → *Add student*
-2. If a parent should see the progress, enter their email under
-   **Who can see this journey** and choose the relation
+**Students** → type the name, their email address, choose the batch →
+*Add student*.
 
-The parent must already have an account. Ask whoever set this up to invite
-them, or invite them yourself from the Supabase dashboard if you have it.
+That is the whole job. The next time that person visits the portal and
+enters the same address, they are signed in and looking at their progress.
+Nothing to invite, nothing to send.
 
-A parent with two children gets linked to both, and sees a dropdown to
-switch between them.
+The email is what connects them, so it has to be right. If a student cannot
+see anything, check for a typo there first.
+
+To give a second person access as well — a parent alongside an older
+student — add their address under **Who can see this journey**.
+
+Someone linked to two dancers, such as a parent with two children, gets a
+dropdown to switch between them.
 
 ## Marking progress
 

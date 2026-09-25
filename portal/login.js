@@ -53,18 +53,15 @@ form.addEventListener('submit', async (event) => {
   const redirectTo = new URL('app.html', window.location.href).href;
   const { error } = await sb.auth.signInWithOtp({
     email: address,
-    options: { emailRedirectTo: redirectTo, shouldCreateUser: false },
+    options: { emailRedirectTo: redirectTo, shouldCreateUser: true },
   });
 
   button.disabled = false;
   button.textContent = 'Send sign-in link';
 
   if (error) {
-    // shouldCreateUser:false means unknown addresses land here. Say something
-    // useful without confirming whether the address is enrolled.
     console.error(error);
-    say('If that address is enrolled, a sign-in link is on its way. '
-      + 'Check your inbox, and your spam folder.', 'ok');
+    say('Could not send the link just now. Please try again in a minute.', 'err');
     return;
   }
 

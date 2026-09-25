@@ -77,7 +77,7 @@ function arm(button, label, action) {
 async function load() {
   const { data, error } = await sb
     .from('students')
-    .select('id, full_name, batch_id, joined_on, active, batches ( name )')
+    .select('id, full_name, contact_email, batch_id, joined_on, active, batches ( name )')
     .order('full_name');
   if (error) return toast(error.message, true);
   students = data ?? [];
@@ -119,13 +119,15 @@ async function addStudent() {
 
   const { data, error } = await sb.from('students').insert({
     full_name,
-    batch_id:  $('nBatch').value || null,
-    joined_on: new Date().toISOString().slice(0, 10),
+    contact_email: $('nEmail').value.trim().toLowerCase() || null,
+    batch_id:      $('nBatch').value || null,
+    joined_on:     new Date().toISOString().slice(0, 10),
   }).select().single();
 
   if (error) return toast(error.message, true);
 
   $('nName').value = '';
+  $('nEmail').value = '';
   toast('Student added');
   await load();
   chosen = students.find((s) => s.id === data.id);
@@ -160,6 +162,11 @@ async function open(student) {
           </select>
         </div>
       </div>
+      <div class="field" style="margin-top:10px">
+        <label for="eEmail">Their email — they sign in with this</label>
+        <input id="eEmail" type="email" value="${esc(student.contact_email ?? '')}"
+               placeholder="nobody can sign in until this is set" />
+      </div>
       <div class="formgrid" style="grid-template-columns:1fr 1fr; margin-top:10px">
         <div class="field">
           <label for="eJoined">Joined</label>
@@ -182,8 +189,9 @@ async function open(student) {
     <div class="card">
       <h3 class="section-title">Who can see this journey</h3>
       <p class="muted" style="margin:-8px 0 14px">
-        The student themselves, or a parent. Anyone linked here sees this
-        dancer's progress and nobody else's.
+        The address above is linked automatically the first time they sign in.
+        Add someone here as well to give a second person access — a parent
+        alongside an older student, say.
       </p>
 
       ${links.length === 0
@@ -217,8 +225,8 @@ async function open(student) {
       </div>
       <div class="row-end"><button class="btn btn--sm" id="link">Link</button></div>
       <p class="muted" style="font-size:.74rem; margin-top:10px">
-        They must already have an account. Invite them first from the Supabase
-        dashboard: Authentication → Users → Add user.
+        If they have never signed in, ask them to visit the portal once and
+        enter this address — then link them here.
       </p>
     </div>
   `;
@@ -230,10 +238,11 @@ async function open(student) {
 function wire(student) {
   $('saveStudent').addEventListener('click', async () => {
     const patch = {
-      full_name: $('eName').value.trim(),
-      batch_id:  $('eBatch').value || null,
-      joined_on: $('eJoined').value || null,
-      active:    $('eActive').value === 'true',
+      full_name:     $('eName').value.trim(),
+      contact_email: $('eEmail').value.trim().toLowerCase() || null,
+      batch_id:      $('eBatch').value || null,
+      joined_on:     $('eJoined').value || null,
+      active:        $('eActive').value === 'true',
     };
     if (!patch.full_name) return toast('A name is required.', true);
 

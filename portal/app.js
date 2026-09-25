@@ -67,7 +67,8 @@ async function start() {
       window.location.replace('teacher.html');
       return;
     }
-    return fail('No dancer is linked to this account yet. Please contact Radhini.');
+    return fail('We do not have a dancer registered against this email address '
+      + 'yet. Ask Radhini to add it, then sign in again — it links itself.');
   }
 
   if (dancers.length > 1) {
