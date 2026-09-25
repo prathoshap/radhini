@@ -6,6 +6,7 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
 
 let batches = [];
 let chosen  = null;
+let showArchived = false;
 
 const session = await requireSession();
 
@@ -104,9 +105,11 @@ async function openBatch(batch) {
     .from('milestones').select('*').eq('batch_id', batch.id).order('sort_order');
   if (error) return toast(error.message, true);
 
-  const withSteps = await Promise.all((milestones ?? []).map((m) =>
+  const visible = (milestones ?? []).filter((m) => showArchived || !m.archived);
+
+  const withSteps = await Promise.all(visible.map((m) =>
     sb.from('steps').select('*').eq('milestone_id', m.id).order('sort_order')
-      .then((r) => ({ ...m, steps: r.data ?? [] }))));
+      .then((r) => ({ ...m, steps: (r.data ?? []).filter((s) => showArchived || !s.archived) }))));
 
   $('detail').innerHTML = `
     <div class="card">
@@ -124,9 +127,15 @@ async function openBatch(batch) {
     </div>
 
     <div class="card">
-      <h3 class="section-title">Milestones</h3>
-      <p class="muted" style="margin:-8px 0 14px">
+      <div class="detail__head">
+        <h3 class="section-title" style="margin:0">Milestones</h3>
+        <label class="muted" style="font-size:.74rem; display:flex; gap:6px; align-items:center">
+          <input type="checkbox" id="showArchived"${showArchived ? ' checked' : ''} /> show archived
+        </label>
+      </div>
+      <p class="muted" style="margin:6px 0 14px">
         In the order students work through them. Edits save when you click away.
+        Archiving hides something without touching anyone's records.
       </p>
       <div id="milestones">
         ${withSteps.length === 0
@@ -140,7 +149,10 @@ async function openBatch(batch) {
                               border-radius:8px; padding:5px 8px; flex:1" />
                 <button class="iconbtn" data-up="${esc(m.id)}" ${i === 0 ? 'disabled' : ''} title="Move up">↑</button>
                 <button class="iconbtn" data-down="${esc(m.id)}" ${i === withSteps.length - 1 ? 'disabled' : ''} title="Move down">↓</button>
-                <button class="iconbtn danger" data-delms="${esc(m.id)}" title="Delete milestone">✕</button>
+                ${m.archived
+                  ? `<button class="iconbtn" data-restorems="${esc(m.id)}" title="Restore">↩</button>
+                     <button class="iconbtn danger" data-delms="${esc(m.id)}" title="Delete permanently">✕</button>`
+                  : `<button class="iconbtn" data-archms="${esc(m.id)}" title="Archive">⊘</button>`}
               </div>
               <div class="ms__body">
                 <input class="msdesc" data-id="${esc(m.id)}" value="${esc(m.description ?? '')}"
@@ -153,7 +165,10 @@ async function openBatch(batch) {
                     <input class="stname" data-id="${esc(s.id)}" value="${esc(s.name)}" />
                     <button class="iconbtn" data-stup="${esc(s.id)}" data-ms="${esc(m.id)}" ${j === 0 ? 'disabled' : ''}>↑</button>
                     <button class="iconbtn" data-stdown="${esc(s.id)}" data-ms="${esc(m.id)}" ${j === m.steps.length - 1 ? 'disabled' : ''}>↓</button>
-                    <button class="iconbtn danger" data-delst="${esc(s.id)}">✕</button>
+                    ${s.archived
+                      ? `<button class="iconbtn" data-restorest="${esc(s.id)}" title="Restore">↩</button>
+                         <button class="iconbtn danger" data-delst="${esc(s.id)}" title="Delete permanently">✕</button>`
+                      : `<button class="iconbtn" data-archst="${esc(s.id)}" title="Archive">⊘</button>`}
                   </div>`).join('')}
                 <div class="addline">
                   <input class="newstep" data-ms="${esc(m.id)}" placeholder="Add a step — e.g. Tatta Adavu 5" />
@@ -245,9 +260,28 @@ function wireMilestones(batch, milestones) {
     button.addEventListener('click', () => swap('steps', steps, id, up ? -1 : +1));
   }
 
-  // deletes — two clicks, and the milestone one says what it takes with it
+  const setArchived = (table, id, value) => async () => {
+    const { error } = await sb.from(table).update({ archived: value }).eq('id', id);
+    if (error) return toast(error.message, true);
+    toast(value ? 'Archived' : 'Restored');
+    reopen();
+  };
+
+  for (const button of root.querySelectorAll('[data-archms]'))
+    button.addEventListener('click', setArchived('milestones', button.dataset.archms, true));
+  for (const button of root.querySelectorAll('[data-restorems]'))
+    button.addEventListener('click', setArchived('milestones', button.dataset.restorems, false));
+  for (const button of root.querySelectorAll('[data-archst]'))
+    button.addEventListener('click', setArchived('steps', button.dataset.archst, true));
+  for (const button of root.querySelectorAll('[data-restorest]'))
+    button.addEventListener('click', setArchived('steps', button.dataset.restorest, false));
+
+  const toggle = root.querySelector('#showArchived');
+  if (toggle) toggle.addEventListener('change', () => { showArchived = toggle.checked; reopen(); });
+
+  // permanent deletes, only offered on something already archived
   for (const button of root.querySelectorAll('[data-delms]')) {
-    arm(button, 'Delete + all progress?', async () => {
+    arm(button, 'Erase + all progress?', async () => {
       const { error } = await sb.from('milestones').delete().eq('id', button.dataset.delms);
       if (error) return toast(error.message, true);
       toast('Milestone deleted');

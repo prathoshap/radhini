@@ -123,7 +123,7 @@ async function openStudent(student) {
 
   const stepsByMilestone = await Promise.all(path.map((m) =>
     sb.from('steps').select('id, name, sort_order')
-      .eq('milestone_id', m.milestone_id).order('sort_order')
+      .eq('milestone_id', m.milestone_id).eq('archived', false).order('sort_order')
       .then((r) => ({ milestone: m, steps: r.data ?? [] }))));
 
   $('detail').innerHTML = `

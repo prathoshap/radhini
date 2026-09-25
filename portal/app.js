@@ -176,7 +176,7 @@ async function renderTracker(student, milestone) {
   // the teacher has touched a step, so anything missing is "not started".
   const [steps, progress] = await Promise.all([
     sb.from('steps').select('id, name, note, sort_order')
-      .eq('milestone_id', milestone.milestone_id).order('sort_order'),
+      .eq('milestone_id', milestone.milestone_id).eq('archived', false).order('sort_order'),
     sb.from('progress').select('step_id, status').eq('student_id', student.id),
   ]);
 
