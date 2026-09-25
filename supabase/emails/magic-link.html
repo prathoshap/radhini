@@ -1,0 +1,78 @@
+<!-- Supabase → Authentication → Emails → Magic Link → Message body
+     Tables and inline styles on purpose: Outlook and Gmail strip most
+     modern CSS. Fonts are web-safe with Georgia as the serif, because
+     Google Fonts do not load reliably in mail clients. -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background:#faf4ee; margin:0; padding:32px 12px; font-family:Helvetica,Arial,sans-serif;">
+  <tr>
+    <td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="max-width:480px; background:#ffffff; border:1px solid #e7dbd0; border-radius:16px;">
+
+        <!-- header -->
+        <tr>
+          <td align="center" style="padding:34px 32px 8px;">
+            <div style="font-family:Georgia,'Times New Roman',serif; font-size:23px; color:#4a2440; letter-spacing:.01em;">
+              Kalaashaala
+            </div>
+            <div style="font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:#c29a4b; padding-top:7px;">
+              Student Portal
+            </div>
+          </td>
+        </tr>
+
+        <!-- rule -->
+        <tr>
+          <td style="padding:20px 32px 0;">
+            <div style="height:1px; background:#e7dbd0; line-height:1px; font-size:0;">&nbsp;</div>
+          </td>
+        </tr>
+
+        <!-- body -->
+        <tr>
+          <td style="padding:26px 32px 0; font-size:15px; line-height:1.65; color:#2c2026;">
+            <p style="margin:0 0 14px;">Namaste,</p>
+            <p style="margin:0 0 22px;">
+              Here is your sign-in link for the Kalaashaala student portal.
+              It works once, and expires in an hour.
+            </p>
+          </td>
+        </tr>
+
+        <!-- button -->
+        <tr>
+          <td align="center" style="padding:0 32px 8px;">
+            <a href="{{ .ConfirmationURL }}"
+               style="display:inline-block; background:#4a2440; color:#faf4ee;
+                      text-decoration:none; padding:14px 34px; border-radius:11px;
+                      font-size:12px; letter-spacing:.14em; text-transform:uppercase;">
+              Sign in
+            </a>
+          </td>
+        </tr>
+
+        <!-- fallback -->
+        <tr>
+          <td style="padding:22px 32px 0; font-size:12px; line-height:1.6; color:#6a5560;">
+            <p style="margin:0 0 6px;">If the button does not work, paste this into your browser:</p>
+            <p style="margin:0; word-break:break-all;">
+              <a href="{{ .ConfirmationURL }}" style="color:#6e2a44;">{{ .ConfirmationURL }}</a>
+            </p>
+          </td>
+        </tr>
+
+        <!-- footer -->
+        <tr>
+          <td style="padding:26px 32px 32px; font-size:11px; line-height:1.6; color:#8c8088;">
+            <div style="height:1px; background:#e7dbd0; line-height:1px; font-size:0; margin-bottom:16px;">&nbsp;</div>
+            If you did not ask to sign in, you can ignore this email — nobody
+            can reach your account without this link.
+            <br /><br />
+            Kalaashaala · Vidushi Radhini Rao
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
