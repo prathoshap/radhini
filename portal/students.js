@@ -139,12 +139,26 @@ async function addStudent() {
 async function open(student) {
   $('detail').innerHTML = '<div class="card"><p class="empty">Loading…</p></div>';
 
-  const { data: links, error } = await sb
-    .from('guardianships')
-    .select('profile_id, relation, profiles ( email, full_name )')
-    .eq('student_id', student.id);
+  const count = (table) => sb.from(table)
+    .select('*', { count: 'exact', head: true })
+    .eq('student_id', student.id).then((r) => r.count ?? 0);
+
+  const [{ data: links, error }, nProgress, nAssess, nPractice, nBadges] = await Promise.all([
+    sb.from('guardianships')
+      .select('profile_id, relation, profiles ( email, full_name )')
+      .eq('student_id', student.id),
+    count('progress'), count('assessments'), count('practice_sessions'), count('student_badges'),
+  ]);
 
   if (error) return toast(error.message, true);
+
+  const records = nProgress + nAssess + nPractice + nBadges;
+  const breakdown = [
+    [nProgress, 'step' + (nProgress === 1 ? '' : 's') + ' of progress'],
+    [nAssess,   'assessment' + (nAssess === 1 ? '' : 's')],
+    [nPractice, 'practice session' + (nPractice === 1 ? '' : 's')],
+    [nBadges,   'badge' + (nBadges === 1 ? '' : 's')],
+  ].filter(([n]) => n > 0).map(([n, label]) => n + ' ' + label).join(', ');
 
   $('detail').innerHTML = `
     <div class="card">
@@ -181,7 +195,6 @@ async function open(student) {
         </div>
       </div>
       <div class="row-end">
-        <button class="iconbtn danger" id="delStudent" title="Delete student">✕</button>
         <button class="btn btn--sm" id="saveStudent">Save</button>
       </div>
     </div>
@@ -229,6 +242,48 @@ async function open(student) {
         enter this address — then link them here.
       </p>
     </div>
+
+    <div class="card">
+      <h3 class="section-title">If they are leaving</h3>
+
+      <div class="leaving">
+        <div>
+          <strong style="font-weight:500; font-size:.88rem">Mark inactive</strong>
+          <p class="muted" style="font-size:.78rem; margin:3px 0 0">
+            They disappear from your lists and can no longer sign in, but
+            everything is kept. Choose this unless you are certain — students
+            come back, and this is undoable.
+          </p>
+        </div>
+        <button class="btn btn--sm" id="deactivate" ${student.active ? '' : 'disabled'}>
+          ${student.active ? 'Mark inactive' : 'Already inactive'}
+        </button>
+      </div>
+
+      ${student.active ? '' : `
+        <div class="leaving">
+          <div>
+            <strong style="font-weight:500; font-size:.88rem">Bring back</strong>
+            <p class="muted" style="font-size:.78rem; margin:3px 0 0">
+              Return them to the active list, with their history intact.
+            </p>
+          </div>
+          <button class="btn btn--sm" id="reactivate">Make active</button>
+        </div>`}
+
+      <div class="leaving leaving--danger">
+        <div>
+          <strong style="font-weight:500; font-size:.88rem; color:#8a2b2b">Delete permanently</strong>
+          <p class="muted" style="font-size:.78rem; margin:3px 0 0">
+            ${records === 0
+              ? 'Nothing is recorded against them yet, so nothing would be lost.'
+              : 'Erases <strong>' + esc(breakdown) + '</strong> along with the dancer. This cannot be undone.'}
+            ${links.length > 0 ? ' ' + links.length + ' family login' + (links.length === 1 ? '' : 's') + ' would lose access.' : ''}
+          </p>
+        </div>
+        <button class="iconbtn danger" id="delStudent" title="Delete permanently">Delete</button>
+      </div>
+    </div>
   `;
 
   wire(student);
@@ -254,7 +309,19 @@ function wire(student) {
     draw();
   });
 
-  arm($('delStudent'), 'Delete + all records?', async () => {
+  const setActive = async (value) => {
+    const { error } = await sb.from('students').update({ active: value }).eq('id', student.id);
+    if (error) return toast(error.message, true);
+    toast(value ? 'Back on the active list' : 'Marked inactive');
+    await load();
+    chosen = students.find((x) => x.id === student.id);
+    draw();
+    open(chosen);
+  };
+  $('deactivate')?.addEventListener('click', () => setActive(false));
+  $('reactivate')?.addEventListener('click', () => setActive(true));
+
+  arm($('delStudent'), records === 0 ? 'Delete?' : 'Erase ' + records + ' records?', async () => {
     const { error } = await sb.from('students').delete().eq('id', student.id);
     if (error) return toast(error.message, true);
     chosen = null;

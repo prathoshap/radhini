@@ -71,8 +71,17 @@ student's progress against it and cannot be undone.
 
 ## When a student leaves
 
-**Students** → choose them → set *Status* to **Inactive**. They disappear
-from the lists but their history is kept, which matters if they come back.
+**Students** → choose them → scroll to **If they are leaving**.
+
+**Mark inactive** is almost always the right choice. They drop off your
+lists and can no longer sign in, but everything is kept — and you can bring
+them back with one click if they return.
+
+**Delete permanently** erases the dancer and everything recorded against
+them: progress, assessments, practice, badges. The button tells you exactly
+how much that is before you press it, and asks twice. There is no undo and
+no backup to recover from. Use it for a duplicate row or a typo, not for
+somebody who has stopped attending.
 
 ## What families can see
 

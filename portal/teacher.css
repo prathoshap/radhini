@@ -107,3 +107,12 @@
 .iconbtn.danger.armed{ background:#8a2b2b; border-color:#8a2b2b; color:#fff; width:auto; padding:0 11px; font-size:.7rem; }
 .addline{ display:grid; grid-template-columns:1fr auto; gap:8px; margin-top:12px; }
 .addline input{ font-family:var(--sans); font-size:.84rem; border:1px solid var(--line); border-radius:10px; padding:9px 11px; background:var(--white); color:var(--ink); }
+
+/* ---------- Leaving / deletion ---------- */
+.leaving{
+  display:grid; grid-template-columns:1fr auto; gap:16px; align-items:center;
+  padding:14px 0; border-top:1px solid var(--cream-2);
+}
+.leaving:first-of-type{ border-top:0; padding-top:4px; }
+.leaving--danger{ border-top:1px solid #f0dcdc; }
+.leaving .iconbtn.danger{ width:auto; padding:0 16px; height:38px; font-size:.72rem; }
