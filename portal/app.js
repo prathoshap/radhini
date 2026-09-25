@@ -25,10 +25,12 @@ $('signOut').addEventListener('click', async () => {
   window.location.replace('index.html');
 });
 
-// Show the console link only to the instructor. Cosmetic only — the console
-// itself re-checks, and RLS refuses writes regardless of what the UI shows.
-sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle()
-  .then(({ data }) => { $('teacherLink').hidden = data?.role !== 'instructor'; });
+// Role decides two things: whether the console link shows, and where an
+// instructor with no dancers of their own should be sent.
+const rolePromise = sb.from('profiles').select('role').eq('id', session.user.id)
+  .maybeSingle().then(({ data }) => data?.role ?? 'student');
+
+rolePromise.then((role) => { $('teacherLink').hidden = role !== 'instructor'; });
 
 $('tabs').addEventListener('click', (e) => {
   const button = e.target.closest('button[data-panel]');
@@ -59,6 +61,12 @@ async function start() {
   dancers = (data ?? []).map((row) => row.students).filter(Boolean);
 
   if (dancers.length === 0) {
+    // The teacher is not a parent. Landing her on an empty student view is
+    // a dead end; send her where the work happens.
+    if (await rolePromise === 'instructor') {
+      window.location.replace('teacher.html');
+      return;
+    }
     return fail('No dancer is linked to this account yet. Please contact Radhini.');
   }
 
