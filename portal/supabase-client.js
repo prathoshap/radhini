@@ -15,7 +15,7 @@ export const sb = configured
   : null;
 
 /** Is the browser currently holding the tail end of a sign-in redirect? */
-function authTokensInUrl() {
+export function authTokensInUrl() {
   const url = new URL(window.location.href);
   return url.hash.includes('access_token') ||
          url.hash.includes('error')        ||
@@ -27,7 +27,7 @@ function authTokensInUrl() {
  * getSession() can answer null while that exchange is still in flight,
  * which sends you straight back to the login page holding a valid link.
  */
-function waitForSession(ms = 5000) {
+export function waitForSession(ms = 5000) {
   return new Promise((resolve) => {
     let done = false;
     const finish = (session) => {

@@ -1,4 +1,4 @@
-import { sb, isConfigured } from './supabase-client.js';
+import { sb, isConfigured, authTokensInUrl, waitForSession } from './supabase-client.js';
 
 const form   = document.getElementById('loginForm');
 const email  = document.getElementById('email');
@@ -17,10 +17,24 @@ if (carried) {
   say(carried, 'err');
 }
 
-// Already signed in? Skip straight through.
+// A sign-in link can land here rather than on app.html, depending on how
+// Site URL is configured. Finish the exchange and move the person along,
+// rather than showing them the form they just came from.
 if (isConfigured) {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) window.location.replace('app.html');
+  if (authTokensInUrl()) {
+    say('Signing you in…', 'ok');
+    const session = await waitForSession();
+    if (session) {
+      window.location.replace('app.html');
+    } else {
+      say('That sign-in link did not work. It may have expired, or already '
+        + 'been used. Request a new one below.', 'err');
+      history.replaceState({}, '', window.location.pathname);
+    }
+  } else {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) window.location.replace('app.html');
+  }
 }
 
 form.addEventListener('submit', async (event) => {
