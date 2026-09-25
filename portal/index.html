@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Portal — Kalaashaala</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/jpeg" href="../assets/img/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&family=Marcellus&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body>
+
+  <main class="login">
+    <div class="box">
+      <img src="../assets/img/logo.jpg" alt="Kalaashaala" />
+      <p class="eyebrow">Kalaashaala</p>
+      <h1>Student Portal</h1>
+      <p class="muted" style="margin-top:8px">
+        Enter your email and we'll send you a sign-in link. No password needed.
+      </p>
+
+      <form id="loginForm" novalidate>
+        <input
+          id="email" type="email" name="email"
+          placeholder="you@example.com"
+          autocomplete="email" required aria-label="Email address" />
+        <button class="btn" type="submit" id="submitBtn">Send sign-in link</button>
+      </form>
+
+      <div class="msg" id="msg" role="status" aria-live="polite"></div>
+
+      <p class="muted" style="margin-top:22px; font-size:.76rem">
+        Trouble signing in? Contact Radhini.
+        <br />
+        <a href="privacy.html">What we keep about your dancer</a>
+        &nbsp;·&nbsp;
+        <a href="../index.html">Main site</a>
+      </p>
+    </div>
+  </main>
+
+  <script type="module" src="login.js"></script>
+</body>
+</html>

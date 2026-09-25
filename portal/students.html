@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Students — Kalaashaala</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/jpeg" href="../assets/img/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&family=Marcellus&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="teacher.css" />
+</head>
+<body>
+
+  <header class="p-header">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/logo.jpg" alt="" />
+      <span><b>Kalaashaala</b><span>Students &amp; Families</span></span>
+    </a>
+    <div class="right">
+      <a class="linkish" href="teacher.html">Progress</a>
+      <a class="linkish" href="curriculum.html">Curriculum</a>
+      <a class="linkish" href="app.html">Student view</a>
+      <button class="linkish" id="signOut">Sign out</button>
+    </div>
+  </header>
+
+  <main class="console" id="main" hidden>
+
+    <aside class="roster">
+      <div class="roster__head">
+        <h2 class="section-title" style="margin:0">Students</h2>
+        <label class="muted" style="font-size:.7rem; display:flex; gap:5px; align-items:center">
+          <input type="checkbox" id="showInactive" /> inactive
+        </label>
+      </div>
+      <input id="search" class="mini search" type="search" placeholder="Search…" aria-label="Search students" />
+      <ul class="roster__list" id="list"></ul>
+      <p class="muted roster__count" id="count"></p>
+
+      <h3 class="section-title" style="margin:18px 0 8px">Add a student</h3>
+      <div class="field"><label for="nName">Name</label><input id="nName" placeholder="Full name" /></div>
+      <div class="field" style="margin-top:9px">
+        <label for="nBatch">Batch</label>
+        <select id="nBatch"></select>
+      </div>
+      <div class="row-end"><button class="btn btn--sm" id="addStudent">Add student</button></div>
+    </aside>
+
+    <section class="detail" id="detail">
+      <div class="card"><p class="empty">Choose a student, or add one.</p></div>
+    </section>
+
+  </main>
+
+  <div class="wrap" id="loading"><p class="muted">Loading…</p></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="students.js"></script>
+</body>
+</html>

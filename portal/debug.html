@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal diagnostics</title>
+  <link rel="stylesheet" href="portal.css" />
+  <style>
+    pre{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;
+        font-size:.76rem;white-space:pre-wrap;word-break:break-all;margin:0 0 12px}
+    .k{color:var(--gold);font-weight:500}
+  </style>
+</head>
+<body>
+  <main class="wrap" style="max-width:760px">
+    <p class="eyebrow">Kalaashaala</p>
+    <h1 style="color:var(--plum);font-size:1.7rem">Portal diagnostics</h1>
+    <p class="muted">Nothing here is secret. Copy the whole lot back to Claude.</p>
+    <div id="out"><p class="muted">Checking…</p></div>
+  </main>
+
+  <script type="module">
+    import { sb, isConfigured } from './supabase-client.js';
+
+    const out = document.getElementById('out');
+    const rows = [];
+    const add = (k, v) => rows.push(
+      `<pre><span class="k">${k}</span>\n${String(v)}</pre>`);
+
+    add('page URL', window.location.href);
+    add('hash', window.location.hash || '(none)');
+    add('query', window.location.search || '(none)');
+    add('config', isConfigured ? 'loaded' : 'PLACEHOLDERS STILL IN config.js');
+
+    try {
+      const { data: { session }, error } = await sb.auth.getSession();
+      add('session', session
+        ? `signed in as ${session.user.email}\nexpires ${new Date(session.expires_at * 1000).toLocaleString()}`
+        : '(none)');
+      if (error) add('session error', error.message);
+
+      if (session) {
+        const { data: profile, error: pe } = await sb
+          .from('profiles').select('email, role').eq('id', session.user.id).maybeSingle();
+        add('profile', pe ? 'ERROR ' + pe.message : JSON.stringify(profile));
+
+        const { data: g, error: ge } = await sb
+          .from('guardianships').select('students ( full_name )');
+        add('dancers visible', ge ? 'ERROR ' + ge.message
+          : (g ?? []).map((r) => r.students?.full_name).join(', ') || '(none linked)');
+
+        const { data: b, error: be } = await sb.from('batches').select('name');
+        add('batches visible', be ? 'ERROR ' + be.message
+          : (b ?? []).map((x) => x.name).join(', ') || '(none)');
+
+        const { error: ae } = await sb.from('steps').select('archived').limit(1);
+        add('004_archive run?', ae ? 'NO — ' + ae.message : 'yes');
+      }
+    } catch (e) {
+      add('threw', e.message);
+    }
+
+    out.innerHTML = rows.join('');
+  </script>
+</body>
+</html>

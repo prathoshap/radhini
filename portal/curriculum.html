@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Curriculum — Kalaashaala</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/jpeg" href="../assets/img/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&family=Marcellus&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="teacher.css" />
+</head>
+<body>
+
+  <header class="p-header">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/logo.jpg" alt="" />
+      <span><b>Kalaashaala</b><span>Curriculum</span></span>
+    </a>
+    <div class="right">
+      <a class="linkish" href="teacher.html">Progress</a>
+      <a class="linkish" href="students.html">Students</a>
+      <a class="linkish" href="app.html">Student view</a>
+      <button class="linkish" id="signOut">Sign out</button>
+    </div>
+  </header>
+
+  <main class="console" id="main" hidden>
+
+    <aside class="roster">
+      <div class="roster__head">
+        <h2 class="section-title" style="margin:0">Batches</h2>
+      </div>
+      <ul class="roster__list" id="batchList"></ul>
+      <div class="field" style="margin-top:12px">
+        <label for="newBatch">Add a batch</label>
+        <input id="newBatch" placeholder="e.g. Batch 4 · Seniors" />
+      </div>
+      <div class="row-end"><button class="btn btn--sm" id="addBatch">Add</button></div>
+    </aside>
+
+    <section class="detail" id="detail">
+      <div class="card"><p class="empty">Choose a batch to edit its milestones.</p></div>
+    </section>
+
+  </main>
+
+  <div class="wrap" id="loading"><p class="muted">Loading…</p></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="curriculum.js"></script>
+</body>
+</html>
