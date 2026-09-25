@@ -283,6 +283,22 @@ async function open(student) {
         </div>
         <button class="iconbtn danger" id="delStudent" title="Delete permanently">Delete</button>
       </div>
+
+      <div class="confirm" id="delConfirm" hidden>
+        <p style="margin:0 0 4px; font-size:.88rem">
+          Permanently erase <strong>${esc(student.full_name)}</strong>${records === 0 ? '' : ' and ' + records + ' record' + (records === 1 ? '' : 's')}?
+        </p>
+        <p class="muted" style="margin:0 0 12px; font-size:.78rem">
+          ${records === 0 ? 'Nothing is recorded against them.' : esc(breakdown) + '.'}
+          There is no undo and no backup.
+        </p>
+        <div class="row-end" style="margin:0">
+          <button class="btn btn--sm" id="delCancel"
+                  style="background:transparent; color:var(--ink); border-color:var(--line)">Cancel</button>
+          <button class="btn btn--sm" id="delYes"
+                  style="background:#8a2b2b; border-color:#8a2b2b">Yes, erase permanently</button>
+        </div>
+      </div>
     </div>
   `;
 
@@ -321,9 +337,37 @@ function wire(student) {
   $('deactivate')?.addEventListener('click', () => setActive(false));
   $('reactivate')?.addEventListener('click', () => setActive(true));
 
-  arm($('delStudent'), records === 0 ? 'Delete?' : 'Erase ' + records + ' records?', async () => {
-    const { error } = await sb.from('students').delete().eq('id', student.id);
-    if (error) return toast(error.message, true);
+  $('delStudent').addEventListener('click', () => {
+    $('delConfirm').hidden = false;
+    $('delStudent').hidden = true;
+    $('delYes').focus();
+  });
+
+  $('delCancel').addEventListener('click', () => {
+    $('delConfirm').hidden = true;
+    $('delStudent').hidden = false;
+  });
+
+  $('delYes').addEventListener('click', async () => {
+    $('delYes').disabled = true;
+    $('delYes').textContent = 'Erasing…';
+
+    // .select() makes the result honest: a delete blocked by a policy
+    // succeeds with no error and removes nothing.
+    const { data, error } = await sb.from('students')
+      .delete().eq('id', student.id).select('id');
+
+    if (error) {
+      $('delYes').disabled = false;
+      $('delYes').textContent = 'Yes, erase permanently';
+      return toast('Could not delete: ' + error.message, true);
+    }
+    if (!data || data.length === 0) {
+      $('delYes').disabled = false;
+      $('delYes').textContent = 'Yes, erase permanently';
+      return toast('Nothing was deleted — you may not have permission.', true);
+    }
+
     chosen = null;
     $('detail').innerHTML = '<div class="card"><p class="empty">Student deleted.</p></div>';
     toast('Student deleted');

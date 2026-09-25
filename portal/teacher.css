@@ -116,3 +116,7 @@
 .leaving:first-of-type{ border-top:0; padding-top:4px; }
 .leaving--danger{ border-top:1px solid #f0dcdc; }
 .leaving .iconbtn.danger{ width:auto; padding:0 16px; height:38px; font-size:.72rem; }
+.confirm{
+  margin-top:12px; padding:14px 16px; border-radius:13px;
+  background:#fdf4f4; border:1px solid #f0dcdc;
+}
