@@ -10,6 +10,13 @@ function say(text, kind) {
   msg.className = 'msg is-on ' + kind;
 }
 
+// Surface whatever went wrong on the way back from a sign-in link.
+const carried = sessionStorage.getItem('portal:authError');
+if (carried) {
+  sessionStorage.removeItem('portal:authError');
+  say(carried, 'err');
+}
+
 // Already signed in? Skip straight through.
 if (isConfigured) {
   const { data: { session } } = await sb.auth.getSession();
