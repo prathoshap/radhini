@@ -25,8 +25,13 @@ yourself through the app — the `profiles_guard_role` trigger silently reverts
 it. Promotion happens here, deliberately:
 
 ```sql
-update profiles set role = 'instructor' where email = 'her@address';
+update profiles set role = 'instructor' where lower(email) = lower('her@address')
+returning email, role;
 ```
+
+`returning` matters — without it a no-op update looks identical to a
+successful one. This needs `005_fix_role_guard.sql` to have been run; before
+that migration the guard reverted changes made here too.
 
 ## Checking the security actually works
 
