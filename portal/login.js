@@ -1,0 +1,52 @@
+import { sb, isConfigured } from './supabase-client.js';
+
+const form   = document.getElementById('loginForm');
+const email  = document.getElementById('email');
+const button = document.getElementById('submitBtn');
+const msg    = document.getElementById('msg');
+
+function say(text, kind) {
+  msg.textContent = text;
+  msg.className = 'msg is-on ' + kind;
+}
+
+// Already signed in? Skip straight through.
+if (isConfigured) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) window.location.replace('app.html');
+}
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (!isConfigured) {
+    say('The portal is not connected to its database yet.', 'err');
+    return;
+  }
+
+  const address = email.value.trim();
+  if (!address) { say('Please enter your email address.', 'err'); return; }
+
+  button.disabled = true;
+  button.textContent = 'Sending…';
+
+  const redirectTo = new URL('app.html', window.location.href).href;
+  const { error } = await sb.auth.signInWithOtp({
+    email: address,
+    options: { emailRedirectTo: redirectTo, shouldCreateUser: false },
+  });
+
+  button.disabled = false;
+  button.textContent = 'Send sign-in link';
+
+  if (error) {
+    // shouldCreateUser:false means unknown addresses land here. Say something
+    // useful without confirming whether the address is enrolled.
+    console.error(error);
+    say('If that address is enrolled, a sign-in link is on its way. '
+      + 'Check your inbox, and your spam folder.', 'ok');
+    return;
+  }
+
+  say('Sign-in link sent. Check your inbox — and your spam folder, just in case.', 'ok');
+  form.reset();
+});

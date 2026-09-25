@@ -1,0 +1,161 @@
+/* =========================================================
+   Kalaashaala Student Portal
+   Same plum / gold / cream palette as the main site.
+   ========================================================= */
+
+:root{
+  --plum:#4a2440; --plum-deep:#341a2e; --maroon:#6e2a44;
+  --gold:#c29a4b; --gold-soft:#e6cf9a;
+  --cream:#faf4ee; --cream-2:#f3e9df; --blush:#f7ece6;
+  --ink:#2c2026; --ink-soft:#6a5560; --white:#fff;
+  --line:#e7dbd0;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --accent:"Marcellus",Georgia,serif;
+  --sans:"Jost",system-ui,sans-serif;
+  --maxw:1080px;
+  --shadow:0 24px 60px -32px rgba(52,26,46,.42);
+  --radius:18px;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+body{
+  margin:0; font-family:var(--sans); font-weight:300;
+  color:var(--ink); background:var(--cream); line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{ font-family:var(--serif); font-weight:500; margin:0; line-height:1.2; }
+a{ color:var(--maroon); }
+
+.eyebrow{
+  font-family:var(--sans); font-size:.68rem; font-weight:500;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--gold);
+}
+.muted{ color:var(--ink-soft); font-size:.86rem; }
+
+/* ---------- Shell ---------- */
+.p-header{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:14px 22px; background:var(--plum); color:var(--cream);
+  position:sticky; top:0; z-index:10;
+}
+.p-header .brand{ display:flex; align-items:center; gap:11px; text-decoration:none; color:inherit; }
+.p-header img{ width:34px; height:34px; border-radius:50%; object-fit:cover; }
+.p-header .brand b{ font-family:var(--accent); font-weight:400; font-size:1rem; letter-spacing:.02em; }
+.p-header .brand span{ display:block; font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; opacity:.7; }
+.p-header .right{ display:flex; align-items:center; gap:12px; font-size:.8rem; }
+.linkish{
+  background:none; border:0; color:var(--gold-soft); font-family:var(--sans);
+  font-size:.8rem; cursor:pointer; padding:6px 2px; text-decoration:underline;
+  text-underline-offset:3px;
+}
+.linkish:hover{ color:var(--white); }
+
+.wrap{ max-width:var(--maxw); margin:0 auto; padding:26px 22px 60px; }
+
+/* ---------- Cards ---------- */
+.card{
+  background:var(--white); border:1px solid var(--line);
+  border-radius:var(--radius); padding:20px; margin-bottom:14px;
+}
+.card--welcome{ background:linear-gradient(135deg,var(--blush),#fffdfa); }
+.section-title{ font-family:var(--accent); font-size:1.02rem; margin-bottom:14px; color:var(--plum); }
+
+.hero{ display:grid; grid-template-columns:1.4fr .6fr; gap:14px; }
+
+/* ---------- Progress ring ---------- */
+.ring{
+  width:96px; height:96px; border-radius:50%; flex:none; display:grid; place-items:center;
+  background:conic-gradient(var(--gold) 0 0%, #eae1d6 0%);
+}
+.ring::after{
+  content:attr(data-pct); width:72px; height:72px; border-radius:50%;
+  background:var(--white); display:grid; place-items:center;
+  font-weight:500; font-size:1.05rem; color:var(--plum); font-family:var(--sans);
+}
+.progressrow{ display:flex; align-items:center; gap:20px; margin-top:16px; }
+
+/* ---------- Stats ---------- */
+.stats{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.stat{ background:var(--cream-2); border-radius:13px; padding:13px; }
+.stat .num{ font-family:var(--serif); font-size:1.7rem; color:var(--plum); line-height:1.1; }
+.stat .lbl{ font-size:.66rem; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-soft); }
+
+/* ---------- Tabs ---------- */
+.tabs{ display:flex; gap:8px; overflow-x:auto; padding-bottom:14px; }
+.tabs button{
+  font-family:var(--sans); font-size:.78rem; white-space:nowrap; cursor:pointer;
+  border:1px solid var(--line); background:var(--white); color:var(--ink);
+  border-radius:999px; padding:9px 16px;
+}
+.tabs button.is-active{ background:var(--plum); border-color:var(--plum); color:var(--cream); }
+
+/* ---------- Learning path ---------- */
+.path{ position:relative; padding-left:6px; }
+.path::before{ content:''; position:absolute; left:22px; top:22px; bottom:22px; width:2px; background:var(--line); }
+.step{ position:relative; display:grid; grid-template-columns:32px 1fr auto; gap:13px; align-items:center; padding:10px 0; }
+.dot{
+  width:31px; height:31px; border-radius:50%; display:grid; place-items:center;
+  background:var(--cream-2); border:2px solid var(--line); font-size:.74rem;
+  color:var(--ink-soft); z-index:1;
+}
+.step.is-complete .dot{ background:var(--gold); border-color:var(--gold); color:var(--white); }
+.step.is-current  .dot{ background:var(--white); border:3px solid var(--plum); box-shadow:0 0 0 5px var(--blush); color:var(--plum); }
+.step .name{ font-size:.86rem; }
+.step .meta{ font-size:.72rem; color:var(--ink-soft); }
+.badge{ font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; padding:5px 10px; border-radius:999px; background:var(--cream-2); color:var(--ink-soft); }
+.step.is-complete .badge{ background:var(--blush); color:var(--maroon); }
+.step.is-current  .badge{ background:var(--plum); color:var(--cream); }
+
+/* ---------- Step grid ---------- */
+.step-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:9px; }
+.tile{ border:1px solid var(--line); border-radius:13px; padding:12px; background:var(--white); min-height:78px; }
+.tile.is-complete{ background:var(--blush); }
+.tile .mark{ float:right; width:20px; height:20px; border-radius:50%; background:var(--cream-2); display:grid; place-items:center; font-size:.64rem; }
+.tile.is-complete .mark{ background:var(--gold); color:var(--white); }
+.tile b{ font-size:.78rem; font-weight:500; }
+.tile span{ display:block; font-size:.66rem; color:var(--ink-soft); margin-top:4px; }
+
+.note{ margin-top:14px; padding:14px; border-radius:13px; background:var(--blush); font-size:.82rem; }
+.note strong{ font-weight:500; color:var(--plum); }
+
+/* ---------- Assessment ---------- */
+.assess{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.assess .ass{ border:1px solid var(--line); border-radius:13px; padding:13px; }
+.bar{ height:6px; border-radius:6px; background:var(--cream-2); margin-top:9px; overflow:hidden; }
+.bar > i{ display:block; height:100%; background:var(--gold); }
+.teacher-note{ margin-top:12px; padding:13px 15px; border-left:3px solid var(--gold); background:var(--cream-2); font-size:.84rem; font-style:italic; }
+
+/* ---------- Login ---------- */
+.login{ min-height:100dvh; display:grid; place-items:center; padding:24px; }
+.login .box{ width:100%; max-width:410px; background:var(--white); border:1px solid var(--line); border-radius:22px; padding:34px 30px; box-shadow:var(--shadow); text-align:center; }
+.login img{ width:62px; height:62px; border-radius:50%; margin:0 auto 16px; object-fit:cover; }
+.login h1{ font-size:1.6rem; color:var(--plum); }
+.login input{
+  width:100%; margin-top:18px; padding:13px 15px; font-family:var(--sans); font-size:.92rem;
+  border:1px solid var(--line); border-radius:12px; background:var(--cream); color:var(--ink);
+}
+.login input:focus{ outline:2px solid var(--gold-soft); outline-offset:1px; }
+.btn{
+  width:100%; margin-top:12px; padding:13px 18px; cursor:pointer;
+  font-family:var(--sans); font-size:.82rem; letter-spacing:.12em; text-transform:uppercase;
+  border:1px solid var(--plum); border-radius:12px; background:var(--plum); color:var(--cream);
+}
+.btn:hover{ background:var(--plum-deep); }
+.btn:disabled{ opacity:.55; cursor:default; }
+
+.msg{ margin-top:16px; font-size:.84rem; padding:12px 14px; border-radius:11px; display:none; }
+.msg.is-on{ display:block; }
+.msg.ok{ background:var(--blush); color:var(--maroon); }
+.msg.err{ background:#fbeaea; color:#8a2b2b; }
+
+.empty{ padding:26px; text-align:center; color:var(--ink-soft); font-size:.86rem; }
+[hidden]{ display:none !important; }
+
+/* ---------- Responsive ---------- */
+@media (max-width:760px){
+  .hero{ grid-template-columns:1fr; }
+  .step-grid{ grid-template-columns:repeat(2,1fr); }
+  .assess{ grid-template-columns:1fr; }
+  .wrap{ padding:18px 15px 50px; }
+  .p-header{ padding:12px 15px; }
+}

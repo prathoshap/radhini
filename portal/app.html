@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Dance Journey — Kalaashaala</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/jpeg" href="../assets/img/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&family=Marcellus&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body>
+
+  <header class="p-header">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/logo.jpg" alt="" />
+      <span><b>Kalaashaala</b><span>Student Portal</span></span>
+    </a>
+    <div class="right">
+      <!-- only shown when one login covers more than one dancer -->
+      <select id="studentSwitch" class="linkish" hidden aria-label="Choose dancer"></select>
+      <span id="whoami" class="muted" style="color:var(--gold-soft)"></span>
+      <button class="linkish" id="signOut">Sign out</button>
+    </div>
+  </header>
+
+  <main class="wrap" id="main" hidden>
+
+    <p class="eyebrow" id="batchLabel"></p>
+    <h1 id="title" style="color:var(--plum); font-size:2rem; margin-top:4px">My Dance Journey</h1>
+    <p class="muted">A record of your learning, practice and milestones.</p>
+
+    <nav class="tabs" style="margin-top:18px" id="tabs">
+      <button data-panel="home" class="is-active">Home</button>
+      <button data-panel="tracker">Adavu Tracker</button>
+      <button data-panel="assessment">Assessment</button>
+      <button data-panel="achievements">Achievements</button>
+    </nav>
+
+    <!-- ============ Home ============ -->
+    <section id="panel-home">
+      <div class="hero">
+        <div class="card card--welcome">
+          <p class="eyebrow" id="heroBatch"></p>
+          <h2 id="heroName" style="font-size:1.45rem; margin-top:4px; color:var(--plum)"></h2>
+          <p class="muted" id="heroSub">Working towards your next milestone.</p>
+          <div class="progressrow">
+            <div class="ring" id="ring" data-pct="0%"></div>
+            <div>
+              <div id="currentMilestone" style="font-size:.92rem"></div>
+              <div class="muted" id="milestoneCount"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="section-title">This term</h3>
+          <div class="stats">
+            <div class="stat"><div class="num" id="statSteps">—</div><div class="lbl">Adavus</div></div>
+            <div class="stat"><div class="num" id="statMilestones">—</div><div class="lbl">Milestones</div></div>
+            <div class="stat"><div class="num" id="statPractices">—</div><div class="lbl">Practices</div></div>
+            <div class="stat"><div class="num" id="statBadges">—</div><div class="lbl">Badges</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="section-title">Your learning path</h3>
+        <div class="path" id="path"></div>
+      </div>
+    </section>
+
+    <!-- ============ Adavu tracker ============ -->
+    <section id="panel-tracker" hidden>
+      <div class="card">
+        <p class="eyebrow">Current milestone</p>
+        <h2 id="trackerTitle" style="font-size:1.25rem; color:var(--plum); margin-top:3px"></h2>
+        <p class="muted">Each item is marked complete by your teacher after assessment.</p>
+        <div class="step-grid" id="stepGrid" style="margin-top:16px"></div>
+        <div class="note" id="trackerNote"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="section-title">Practice log</h3>
+        <div class="stats">
+          <div class="stat"><div class="num" id="practiceCount">—</div><div class="lbl">Sessions this term</div></div>
+          <div class="stat"><div class="num" id="practiceTime">—</div><div class="lbl">Practice time</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Assessment ============ -->
+    <section id="panel-assessment" hidden>
+      <div class="card" id="assessCard">
+        <p class="eyebrow">Teacher assessment</p>
+        <h2 id="assessTitle" style="font-size:1.25rem; color:var(--plum); margin-top:3px"></h2>
+        <div class="assess" id="assessBars" style="margin-top:16px"></div>
+        <div class="teacher-note" id="assessNote" hidden></div>
+      </div>
+    </section>
+
+    <!-- ============ Achievements ============ -->
+    <section id="panel-achievements" hidden>
+      <div class="card">
+        <h3 class="section-title">Achievements</h3>
+        <div class="stats" id="badgeGrid"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="wrap" id="loading"><p class="muted">Loading your journey…</p></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
