@@ -1,11 +1,15 @@
 # Portal emails
 
-`magic-link.html` → Supabase → Authentication → **Emails** → *Magic Link* →
-replace the **Message body**.
+| File | Supabase template | Suggested subject |
+|---|---|---|
+| `magic-link.html` | **Magic Link** | `Your sign-in link · Kalaashaala` |
+| `invite.html` | **Invite user** | `Your Kalaashaala student portal` |
 
-Suggested subject:
+Authentication → **Emails** → pick the tab → replace the **Message body**.
 
-    Your sign-in link · Kalaashaala
+`invite.html` is the one families see first, when Radhini adds them. It
+explains what the portal is and that there is no password, because for most
+of them this will be the only explanation they get.
 
 ## Sender address
 

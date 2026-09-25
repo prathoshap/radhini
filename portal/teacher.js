@@ -108,18 +108,21 @@ function drawRoster() {
 async function openStudent(student) {
   $('detail').innerHTML = '<div class="card"><p class="empty">Loading…</p></div>';
 
-  const [milestones, progress, assessments, badges, awarded] = await Promise.all([
+  const [milestones, progress, assessments, badges, awarded, practice] = await Promise.all([
     sb.from('milestone_progress').select('*').eq('student_id', student.student_id).order('sort_order'),
     sb.from('progress').select('step_id, status').eq('student_id', student.student_id),
     sb.from('assessments').select('id, rhythm, precision_score, coordination, note, assessed_on, milestones ( name )')
       .eq('student_id', student.student_id).order('assessed_on', { ascending: false }).limit(5),
     sb.from('badges').select('id, name, icon').order('sort_order'),
     sb.from('student_badges').select('badge_id').eq('student_id', student.student_id),
+    sb.from('practice_sessions').select('id, session_date, minutes, note')
+      .eq('student_id', student.student_id).order('session_date', { ascending: false }).limit(8),
   ]);
 
   const path     = milestones.data ?? [];
   const statusOf = new Map((progress.data ?? []).map((p) => [p.step_id, p.status]));
   const held     = new Set((awarded.data ?? []).map((r) => r.badge_id));
+  const totalMinutes = (practice.data ?? []).reduce((t, p) => t + (p.minutes ?? 0), 0);
 
   const stepsByMilestone = await Promise.all(path.map((m) =>
     sb.from('steps').select('id, name, sort_order')
@@ -205,6 +208,40 @@ async function openStudent(student) {
     </div>
 
     <div class="card">
+      <h3 class="section-title">Practice log</h3>
+      <p class="muted" style="margin:-8px 0 14px">
+        ${totalMinutes >= 60
+          ? Math.floor(totalMinutes / 60) + 'h ' + (totalMinutes % 60) + 'm'
+          : totalMinutes + 'm'} across ${(practice.data ?? []).length} recorded session${(practice.data ?? []).length === 1 ? '' : 's'}.
+      </p>
+      <div class="formgrid">
+        <div class="field">
+          <label for="pDate">Date</label>
+          <input id="pDate" type="date" value="${new Date().toISOString().slice(0, 10)}" />
+        </div>
+        <div class="field">
+          <label for="pMinutes">Minutes</label>
+          <input id="pMinutes" type="number" min="1" max="600" placeholder="e.g. 45" />
+        </div>
+        <div class="field">
+          <label for="pNote">Note</label>
+          <input id="pNote" placeholder="Optional" />
+        </div>
+      </div>
+      <div class="row-end"><button class="btn btn--sm" id="addPractice">Add session</button></div>
+
+      ${(practice.data ?? []).length === 0 ? '' : `
+        <div style="margin-top:16px">
+          ${practice.data.map((p) => `
+            <div class="editrow" style="grid-template-columns:auto 1fr auto">
+              <span class="muted" style="font-size:.78rem; min-width:92px">${esc(p.session_date)}</span>
+              <span style="font-size:.82rem">${p.minutes ?? 0} min${p.note ? ' · ' + esc(p.note) : ''}</span>
+              <button class="iconbtn danger" data-delpractice="${esc(p.id)}" title="Remove">✕</button>
+            </div>`).join('')}
+        </div>`}
+    </div>
+
+    <div class="card">
       <h3 class="section-title">Badges</h3>
       <div class="chips" id="badgeChips">
         ${(badges.data ?? []).map((b) => `
@@ -219,6 +256,7 @@ async function openStudent(student) {
   wireProgress(student);
   wireAssessment(student);
   wireBadges(student, held);
+  wirePractice(student);
 }
 
 // ---------------------------------------------------------------
@@ -297,6 +335,33 @@ function wireBadges(student, held) {
       has ? held.delete(id) : held.add(id);
       chip.classList.toggle('is-on', !has);
       toast(has ? 'Badge withdrawn' : 'Badge awarded');
+    });
+  }
+}
+
+function wirePractice(student) {
+  $('addPractice').addEventListener('click', async () => {
+    const minutes = Number($('pMinutes').value);
+    if (!minutes || minutes < 1) return toast('How many minutes?', true);
+
+    const { error } = await sb.from('practice_sessions').insert({
+      student_id:   student.student_id,
+      session_date: $('pDate').value || new Date().toISOString().slice(0, 10),
+      minutes,
+      note:         $('pNote').value.trim() || null,
+    });
+
+    if (error) return toast('Could not save: ' + error.message, true);
+    toast('Session added');
+    openStudent(student);
+  });
+
+  for (const button of $('detail').querySelectorAll('[data-delpractice]')) {
+    button.addEventListener('click', async () => {
+      const { error } = await sb.from('practice_sessions').delete().eq('id', button.dataset.delpractice);
+      if (error) return toast('Could not remove: ' + error.message, true);
+      toast('Session removed');
+      openStudent(student);
     });
   }
 }
