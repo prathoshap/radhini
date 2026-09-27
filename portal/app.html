@@ -30,14 +30,14 @@
   <main class="wrap" id="main" hidden>
 
     <p class="eyebrow" id="batchLabel"></p>
-    <h1 id="title" style="color:var(--plum); font-size:2rem; margin-top:4px">My Dance Journey</h1>
-    <p class="muted">A record of your learning, practice and milestones.</p>
+    <h1 id="title" data-label="title" style="color:var(--plum); font-size:2rem; margin-top:4px">My Dance Journey</h1>
+    <p class="muted" data-label="subtitle">A record of your learning, practice and milestones.</p>
 
     <nav class="tabs" style="margin-top:18px" id="tabs">
-      <button data-panel="home" class="is-active">Home</button>
-      <button data-panel="tracker">Adavu Tracker</button>
-      <button data-panel="assessment">Assessment</button>
-      <button data-panel="achievements">Achievements</button>
+      <button data-panel="home" data-label="tab_home" class="is-active">Home</button>
+      <button data-panel="tracker" data-label="tab_tracker">Adavu Tracker</button>
+      <button data-panel="assessment" data-label="tab_assessment">Assessment</button>
+      <button data-panel="achievements" data-label="tab_achievements">Achievements</button>
     </nav>
 
     <!-- ============ Home ============ -->
@@ -57,18 +57,18 @@
         </div>
 
         <div class="card">
-          <h3 class="section-title">This term</h3>
+          <h3 class="section-title" data-label="h_term">This term</h3>
           <div class="stats">
-            <div class="stat"><div class="num" id="statSteps">—</div><div class="lbl">Adavus</div></div>
-            <div class="stat"><div class="num" id="statMilestones">—</div><div class="lbl">Milestones</div></div>
-            <div class="stat"><div class="num" id="statPractices">—</div><div class="lbl">Practices</div></div>
-            <div class="stat"><div class="num" id="statBadges">—</div><div class="lbl">Badges</div></div>
+            <div class="stat"><div class="num" id="statSteps">—</div><div class="lbl" data-label="stat_steps">Adavus</div></div>
+            <div class="stat"><div class="num" id="statMilestones">—</div><div class="lbl" data-label="stat_milestones">Milestones</div></div>
+            <div class="stat"><div class="num" id="statPractices">—</div><div class="lbl" data-label="stat_practices">Practices</div></div>
+            <div class="stat"><div class="num" id="statBadges">—</div><div class="lbl" data-label="stat_badges">Badges</div></div>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <h3 class="section-title">Your learning path</h3>
+        <h3 class="section-title" data-label="h_path">Your learning path</h3>
         <div class="path" id="path"></div>
       </div>
     </section>
@@ -84,7 +84,7 @@
       </div>
 
       <div class="card">
-        <h3 class="section-title">Practice log</h3>
+        <h3 class="section-title" data-label="h_practice">Practice log</h3>
         <div class="stats">
           <div class="stat"><div class="num" id="practiceCount">—</div><div class="lbl">Sessions this term</div></div>
           <div class="stat"><div class="num" id="practiceTime">—</div><div class="lbl">Practice time</div></div>
@@ -105,7 +105,7 @@
     <!-- ============ Achievements ============ -->
     <section id="panel-achievements" hidden>
       <div class="card">
-        <h3 class="section-title">Achievements</h3>
+        <h3 class="section-title" data-label="h_achievements">Achievements</h3>
         <div class="stats" id="badgeGrid"></div>
       </div>
     </section>

@@ -13,6 +13,19 @@ const STATUS_LABEL = {
 
 let dancers = [];     // every student this login may see
 let current = null;   // the one on screen
+let labels  = {};     // wording, editable by the instructor
+
+/** Radhini's wording, over whatever the HTML shipped with. */
+async function applyLabels() {
+  const { data, error } = await sb.from('portal_labels').select('key, value');
+  if (error) return;                       // fall back to what is in the HTML
+  labels = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
+  for (const el of document.querySelectorAll('[data-label]')) {
+    const text = labels[el.dataset.label];
+    if (text) el.textContent = text;
+  }
+  if (labels.title) document.title = labels.title + ' — Kalaashaala';
+}
 
 // ---------------------------------------------------------------
 // Boot
@@ -46,6 +59,7 @@ $('studentSwitch').addEventListener('change', (e) => {
   render(current);
 });
 
+await applyLabels();
 await start();
 
 // ---------------------------------------------------------------
@@ -116,7 +130,7 @@ async function render(student) {
   // "current" = first milestone that is not finished
   const currentMilestone = path.find((m) => Number(m.percent_complete) < 100) ?? null;
   $('currentMilestone').textContent = currentMilestone
-    ? `Currently learning · ${currentMilestone.name}`
+    ? `${labels.current_prefix ?? 'Currently learning'} · ${currentMilestone.name}`
     : 'All milestones complete';
   $('milestoneCount').textContent =
     `${s.milestones_complete ?? 0} of ${s.milestones_total ?? 0} milestones complete`;
@@ -153,7 +167,7 @@ async function render(student) {
 
   // ---- badges
   $('badgeGrid').innerHTML = (badges.data ?? []).length === 0
-    ? '<p class="empty">No badges yet — they appear here as you earn them.</p>'
+    ? `<p class="empty">${esc(labels.empty_badges ?? 'No badges yet — they appear here as you earn them.')}</p>`
     : badges.data.map((row) => `
         <div class="stat">
           <div style="font-size:1.3rem">${esc(row.badges?.icon ?? '✦')}</div>

@@ -69,6 +69,15 @@ To remove something, use **⊘ archive** rather than deleting. Archiving hides
 it from students but keeps every record. Deleting a milestone erases every
 student's progress against it and cannot be undone.
 
+## Changing the wording students see
+
+**Curriculum** → **✎ Portal wording**. The headings and labels around the
+curriculum — "My Dance Journey", the tab names, "This term" — are all yours
+to reword. Edits save when you click away.
+
+If you change your mind, **Restore the original wording** puts everything
+back.
+
 ## When a student leaves
 
 **Students** → choose them → scroll to **If they are leaving**.

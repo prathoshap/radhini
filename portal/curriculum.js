@@ -30,6 +30,7 @@ async function boot() {
   }
 
   await loadBatches();
+  $('openWording').addEventListener('click', openWording);
   $('addBatch').addEventListener('click', addBatch);
   $('newBatch').addEventListener('keydown', (e) => { if (e.key === 'Enter') addBatch(); });
 
@@ -82,6 +83,7 @@ async function loadBatches() {
   for (const button of $('batchList').querySelectorAll('button[data-id]')) {
     button.addEventListener('click', () => {
       chosen = batches.find((b) => b.id === button.dataset.id);
+      $('openWording').classList.remove('is-on');
       loadBatches();
       openBatch(chosen);
     });
@@ -97,6 +99,70 @@ async function addBatch() {
   $('newBatch').value = '';
   toast('Batch added');
   await loadBatches();
+}
+
+// ---------------------------------------------------------------
+// The wording students read. Everything the curriculum calls itself is
+// already hers; this is the frame around it.
+// ---------------------------------------------------------------
+async function openWording() {
+  chosen = null;
+  await loadBatches();
+  $('openWording').classList.add('is-on');
+  $('detail').innerHTML = '<div class="card"><p class="empty">Loading…</p></div>';
+
+  const { data, error } = await sb.from('portal_labels')
+    .select('key, value, description').order('sort_order');
+  if (error) return toast(error.message, true);
+
+  $('detail').innerHTML = `
+    <div class="card">
+      <p class="eyebrow">Portal wording</p>
+      <h2 style="font-size:1.5rem; color:var(--plum); margin-top:3px">What students read</h2>
+      <p class="muted" style="margin-top:4px">
+        The headings and labels around the curriculum. Edits save when you
+        click away, and students see them the next time the page loads.
+      </p>
+    </div>
+
+    <div class="card">
+      ${(data ?? []).map((row) => `
+        <div class="editrow" style="grid-template-columns:1fr">
+          <label style="font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+                        color:var(--ink-soft); display:block; margin-bottom:4px">
+            ${esc(row.description ?? row.key)}
+          </label>
+          <input class="labelval" data-key="${esc(row.key)}" value="${esc(row.value)}"
+                 style="border-color:var(--line); background:var(--white)" />
+        </div>`).join('')}
+      <div class="row-end">
+        <button class="btn btn--sm" id="resetWording"
+                style="background:transparent; color:var(--ink); border-color:var(--line)">
+          Restore the original wording
+        </button>
+      </div>
+    </div>
+  `;
+
+  for (const input of $('detail').querySelectorAll('.labelval')) {
+    const original = input.value;
+    input.addEventListener('blur', async () => {
+      const value = input.value.trim();
+      if (value === original) return;
+      if (!value) { input.value = original; return toast('This cannot be left empty.', true); }
+      const { error } = await sb.from('portal_labels')
+        .update({ value }).eq('key', input.dataset.key);
+      if (error) { input.value = original; return toast(error.message, true); }
+      toast('Saved');
+    });
+  }
+
+  arm($('resetWording'), 'Restore all wording?', async () => {
+    const { error } = await sb.rpc('reset_portal_labels');
+    if (error) return toast(error.message, true);
+    toast('Original wording restored');
+    openWording();
+  });
 }
 
 // ---------------------------------------------------------------
