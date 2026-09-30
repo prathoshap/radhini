@@ -42,7 +42,8 @@ dropdown to switch between them.
 
 ## Marking progress
 
-**Progress** → choose a student → each step has a dropdown:
+**Progress** → pick the student from the dropdown at the top → each step has
+a dropdown of its own:
 
 - *Not started*
 - *Progressing* — amber

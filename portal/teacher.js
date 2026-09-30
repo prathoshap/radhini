@@ -53,8 +53,12 @@ async function boot() {
   $('batchFilter').insertAdjacentHTML('beforeend',
     batches.map((x) => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join(''));
 
-  $('batchFilter').addEventListener('change', drawRoster);
-  $('search').addEventListener('input', drawRoster);
+  $('batchFilter').addEventListener('change', () => { selected = null; drawRoster(); });
+  $('studentPick').addEventListener('change', () => {
+    selected = roster.find((s) => s.student_id === $('studentPick').value) ?? null;
+    if (selected) openStudent(selected);
+    else $('detail').innerHTML = '<div class="card"><p class="empty">Choose a student.</p></div>';
+  });
 
   drawRoster();
   $('loading').hidden = true;
@@ -77,31 +81,21 @@ function toast(message, isError = false) {
 // ---------------------------------------------------------------
 function drawRoster() {
   const batch = $('batchFilter').value;
-  const term  = $('search').value.trim().toLowerCase();
+  const shown = roster.filter((s) => !batch || s.batch_id === batch);
 
-  const shown = roster.filter((s) =>
-    (!batch || s.batch_id === batch) &&
-    (!term  || (s.full_name ?? '').toLowerCase().includes(term)));
+  $('studentPick').innerHTML =
+    '<option value="">Choose a student…</option>' +
+    shown.map((s) =>
+      `<option value="${esc(s.student_id)}"${s.student_id === selected?.student_id ? ' selected' : ''}>` +
+      `${esc(s.full_name)} · ${s.percent_complete ?? 0}%</option>`).join('');
 
-  $('rosterList').innerHTML = shown.length === 0
-    ? '<li><p class="empty" style="padding:14px">No students match.</p></li>'
-    : shown.map((s) => `
-        <li>
-          <button data-id="${esc(s.student_id)}" class="${s.student_id === selected?.student_id ? 'is-active' : ''}">
-            <span class="nm">${esc(s.full_name)}</span>
-            <span class="pc">${s.percent_complete ?? 0}%</span>
-          </button>
-        </li>`).join('');
+  $('rosterCount').textContent = shown.length === roster.length
+    ? `${roster.length} student${roster.length === 1 ? '' : 's'}`
+    : `${shown.length} of ${roster.length}`;
 
-  $('rosterCount').textContent =
-    `${shown.length} of ${roster.length} student${roster.length === 1 ? '' : 's'}`;
-
-  for (const button of $('rosterList').querySelectorAll('button[data-id]')) {
-    button.addEventListener('click', () => {
-      selected = roster.find((s) => s.student_id === button.dataset.id);
-      drawRoster();
-      openStudent(selected);
-    });
+  if (selected && !shown.some((s) => s.student_id === selected.student_id)) {
+    selected = null;
+    $('detail').innerHTML = '<div class="card"><p class="empty">Choose a student.</p></div>';
   }
 }
 

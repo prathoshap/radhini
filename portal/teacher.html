@@ -28,20 +28,23 @@
     </div>
   </header>
 
-  <main class="console" id="main" hidden>
+  <main class="console console--single" id="main" hidden>
 
-    <!-- ============ Roster ============ -->
-    <aside class="roster">
-      <div class="roster__head">
-        <h2 class="section-title" style="margin:0">Students</h2>
-        <select id="batchFilter" class="mini" aria-label="Filter by batch">
+    <div class="picker">
+      <label class="picker__field">
+        <span>Batch</span>
+        <select id="batchFilter" aria-label="Filter by batch">
           <option value="">All batches</option>
         </select>
-      </div>
-      <input id="search" class="mini search" type="search" placeholder="Search by name…" aria-label="Search students" />
-      <ul class="roster__list" id="rosterList"></ul>
-      <p class="muted roster__count" id="rosterCount"></p>
-    </aside>
+      </label>
+      <label class="picker__field picker__field--grow">
+        <span>Student</span>
+        <select id="studentPick" aria-label="Choose a student">
+          <option value="">Choose a student…</option>
+        </select>
+      </label>
+      <span class="muted" id="rosterCount"></span>
+    </div>
 
     <!-- ============ Detail ============ -->
     <section class="detail" id="detail">

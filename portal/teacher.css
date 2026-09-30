@@ -182,3 +182,29 @@
 }
 .speedtoggle:hover{ border-color:var(--gold); color:var(--plum); }
 .speedtoggle.is-on{ background:var(--blush); border-color:var(--gold); color:var(--maroon); font-weight:500; }
+
+/* ---------- Student picker (replaces the roster panel) ---------- */
+.console--single{ grid-template-columns:1fr; }
+
+.picker{
+  display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap;
+  background:var(--white); border:1px solid var(--line);
+  border-radius:var(--radius); padding:14px 16px; margin-bottom:16px;
+}
+.picker__field{ display:flex; flex-direction:column; gap:5px; min-width:180px; }
+.picker__field--grow{ flex:1; }
+.picker__field > span{
+  font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft);
+}
+.picker select{
+  font-family:var(--sans); font-size:.9rem; color:var(--ink);
+  border:1px solid var(--line); border-radius:11px; padding:10px 12px;
+  background:var(--white); width:100%; min-height:42px;
+}
+.picker select:focus{ outline:2px solid var(--gold-soft); outline-offset:1px; }
+.picker .muted{ font-size:.74rem; padding-bottom:11px; }
+
+@media (max-width:760px){
+  .picker{ flex-direction:column; align-items:stretch; }
+  .picker .muted{ padding-bottom:0; }
+}
