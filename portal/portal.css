@@ -159,3 +159,12 @@ a{ color:var(--maroon); }
   .wrap{ padding:18px 15px 50px; }
   .p-header{ padding:12px 15px; }
 }
+
+/* Speeds, read-only, on a student's tracker tile */
+.tile__speeds{ display:flex; gap:4px; margin-top:8px; }
+.tile__speeds .box{
+  width:13px; height:13px; border-radius:3px; display:inline-block;
+  border:1.5px solid #cfc4b8; background:var(--white);
+}
+.tile__speeds .box.is-complete{   background:#5c8a3a; border-color:#4a7030; }
+.tile__speeds .box.is-practising{ background:#e3b23c; border-color:#c9922e; }

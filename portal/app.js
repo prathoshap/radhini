@@ -200,22 +200,36 @@ async function renderTracker(student, milestone) {
 
   // Steps and progress come back separately — progress rows only exist once
   // the teacher has touched a step, so anything missing is "not started".
-  const [steps, progress] = await Promise.all([
+  const [steps, progress, meta, speeds] = await Promise.all([
     sb.from('steps').select('id, name, note, sort_order')
       .eq('milestone_id', milestone.milestone_id).eq('archived', false).order('sort_order'),
     sb.from('progress').select('step_id, status').eq('student_id', student.id),
+    sb.from('milestones').select('tracks_speed').eq('id', milestone.milestone_id).maybeSingle(),
+    sb.from('step_speed').select('step_id, speed, status').eq('student_id', student.id),
   ]);
 
   const statusOf = new Map((progress.data ?? []).map((p) => [p.step_id, p.status]));
+  const speedy   = meta.data?.tracks_speed === true;
+
+  const speedOf = new Map();
+  for (const row of speeds.data ?? []) {
+    if (!speedOf.has(row.step_id)) speedOf.set(row.step_id, {});
+    speedOf.get(row.step_id)[row.speed] = row.status;
+  }
 
   $('stepGrid').innerHTML = (steps.data ?? []).map((step, i) => {
     const status = statusOf.get(step.id) ?? 'not_started';
     const done   = status === 'complete';
+    const sp     = speedOf.get(step.id) ?? {};
     return `
       <div class="tile ${done ? 'is-complete' : ''}">
         <div class="mark">${done ? '✓' : i + 1}</div>
         <b>${esc(step.name)}</b>
         <span>${esc(step.note || STATUS_LABEL[status])}</span>
+        ${speedy ? `
+          <span class="tile__speeds" aria-label="Speeds learnt">
+            ${[1, 2, 3].map((n) => `<i class="box is-${sp[n] ?? 'not_started'}"></i>`).join('')}
+          </span>` : ''}
       </div>`;
   }).join('');
 

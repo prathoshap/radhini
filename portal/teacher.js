@@ -125,6 +125,20 @@ async function openStudent(student) {
   const held     = new Set((awarded.data ?? []).map((r) => r.badge_id));
   const totalMinutes = (practice.data ?? []).reduce((t, p) => t + (p.minutes ?? 0), 0);
 
+  const [meta, speeds] = await Promise.all([
+    sb.from('milestones').select('id, tracks_speed').eq('batch_id', student.batch_id),
+    sb.from('step_speed').select('step_id, speed, status').eq('student_id', student.student_id),
+  ]);
+
+  const tracksSpeed = new Map((meta.data ?? []).map((m) => [m.id, m.tracks_speed]));
+
+  // step_id -> { 1: status, 2: status, 3: status }
+  const speedOf = new Map();
+  for (const row of speeds.data ?? []) {
+    if (!speedOf.has(row.step_id)) speedOf.set(row.step_id, {});
+    speedOf.get(row.step_id)[row.speed] = row.status;
+  }
+
   const stepsByMilestone = await Promise.all(path.map((m) =>
     sb.from('steps').select('id, name, sort_order')
       .eq('milestone_id', m.milestone_id).eq('archived', false).order('sort_order')
@@ -145,13 +159,21 @@ async function openStudent(student) {
     <div class="card">
       <h3 class="section-title">Progress</h3>
       <p class="muted" style="margin:-8px 0 14px">Changes save the moment you pick them.</p>
-      ${stepsByMilestone.map(({ milestone, steps }) => `
-        <div class="ms">
-          <div class="ms__head">
+      ${stepsByMilestone.map(({ milestone, steps }) => {
+        const speedy = tracksSpeed.get(milestone.milestone_id) === true;
+        const stepState = (id) => statusOf.get(id) ?? 'not_started';
+        return `
+        <div class="ms" data-ms="${esc(milestone.milestone_id)}">
+          <div class="ms__head" data-toggle="${esc(milestone.milestone_id)}">
+            <span class="ms__chev">›</span>
             <h4>${esc(milestone.name)}</h4>
-            <span class="ms__pct">${milestone.completed_steps}/${milestone.total_steps}</span>
+            <span class="boxes">
+              ${steps.map((st) => `<i class="box is-${stepState(st.id)}" title="${esc(st.name)}"></i>`).join('')}
+            </span>
+            <span class="ms__pct">${steps.length ? milestone.completed_steps + '/' + milestone.total_steps : ''}</span>
           </div>
-          <div class="ms__body">
+
+          <div class="ms__body" hidden>
             ${steps.length === 0
               ? `<div class="steprow" style="border-bottom:0">
                    <span class="sname muted">${esc(milestone.name)} as a whole</span>
@@ -162,18 +184,38 @@ async function openStudent(student) {
                    </select>
                  </div>`
               : steps.map((step) => {
-                  const status = statusOf.get(step.id) ?? 'not_started';
+                  const status = stepState(step.id);
+                  if (!speedy) {
+                    return `
+                      <div class="steprow">
+                        <span class="sname">${esc(step.name)}</span>
+                        <select data-step="${esc(step.id)}" data-status="${status}">
+                          ${STATUSES.map(([v, label]) =>
+                            `<option value="${v}"${v === status ? ' selected' : ''}>${label}</option>`).join('')}
+                        </select>
+                      </div>`;
+                  }
+                  const sp = speedOf.get(step.id) ?? {};
                   return `
-                    <div class="steprow">
+                    <div class="steprow steprow--speed">
                       <span class="sname">${esc(step.name)}</span>
-                      <select data-step="${esc(step.id)}" data-status="${status}">
-                        ${STATUSES.map(([v, label]) =>
-                          `<option value="${v}"${v === status ? ' selected' : ''}>${label}</option>`).join('')}
-                      </select>
+                      <span class="speedset">
+                        <span class="speedlbl">Speed</span>
+                        ${[1, 2, 3].map((n) => {
+                          const st = sp[n] ?? 'not_started';
+                          return `<button class="box box--tap is-${st}"
+                                          data-step="${esc(step.id)}" data-speed="${n}"
+                                          data-status="${st}"
+                                          title="Speed ${n} — ${STATUSES.find(([v]) => v === st)[1]}"
+                                          aria-label="Speed ${n}, ${STATUSES.find(([v]) => v === st)[1]}"></button>`;
+                        }).join('')}
+                      </span>
+                      <span class="steplabel is-${status}">${STATUSES.find(([v]) => v === status)[1]}</span>
                     </div>`;
                 }).join('')}
           </div>
-        </div>`).join('')}
+        </div>`;
+      }).join('')}
     </div>
 
     <div class="card">
@@ -267,7 +309,71 @@ async function openStudent(student) {
 }
 
 // ---------------------------------------------------------------
+const CYCLE = ['not_started', 'practising', 'complete'];
+
+function paint(el, status) {
+  el.classList.remove('is-not_started', 'is-practising', 'is-complete');
+  el.classList.add('is-' + status);
+  el.dataset.status = status;
+}
+
 function wireProgress(student) {
+  // Expand a milestone to see its steps. Collapsed, the boxes on the
+  // header already say where the student stands.
+  for (const head of $('detail').querySelectorAll('.ms__head[data-toggle]')) {
+    head.addEventListener('click', () => {
+      const ms = head.closest('.ms');
+      const body = ms.querySelector('.ms__body');
+      body.hidden = !body.hidden;
+      ms.classList.toggle('is-open', !body.hidden);
+    });
+  }
+
+  // A speed box cycles: not started -> progressing -> learnt.
+  for (const box of $('detail').querySelectorAll('.box--tap')) {
+    box.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const previous = box.dataset.status;
+      const next = CYCLE[(CYCLE.indexOf(previous) + 1) % CYCLE.length];
+
+      paint(box, next);
+      box.disabled = true;
+
+      const { error } = await sb.from('step_speed').upsert({
+        student_id: student.student_id,
+        step_id:    box.dataset.step,
+        speed:      Number(box.dataset.speed),
+        status:     next,
+        updated_by: me.id,
+      }, { onConflict: 'student_id,step_id,speed' });
+
+      box.disabled = false;
+      if (error) {
+        paint(box, previous);
+        return toast('Could not save: ' + error.message, true);
+      }
+
+      // The database derives the step from its three speeds; reflect it.
+      const row = box.closest('.steprow');
+      const states = [...row.querySelectorAll('.box--tap')].map((b) => b.dataset.status);
+      const derived = states.every((x) => x === 'complete') ? 'complete'
+                    : states.some((x) => x !== 'not_started') ? 'practising'
+                    : 'not_started';
+
+      const label = row.querySelector('.steplabel');
+      label.textContent = STATUSES.find(([v]) => v === derived)[1];
+      paint(label, derived);
+
+      const ms = box.closest('.ms');
+      const idx = [...ms.querySelectorAll('.steprow')].indexOf(row);
+      const headBox = ms.querySelectorAll('.ms__head .box')[idx];
+      if (headBox) paint(headBox, derived);
+
+      toast('Saved');
+      await refreshRoster(student.student_id);
+    });
+  }
+
   for (const select of $('detail').querySelectorAll('select[data-milestone]')) {
     select.addEventListener('change', async () => {
       const previous = select.dataset.status;
@@ -315,6 +421,15 @@ function wireProgress(student) {
       }
 
       select.dataset.status = status;
+
+      const ms = select.closest('.ms');
+      const row = select.closest('.steprow');
+      if (ms && row) {
+        const idx = [...ms.querySelectorAll('.steprow')].indexOf(row);
+        const headBox = ms.querySelectorAll('.ms__head .box')[idx];
+        if (headBox) paint(headBox, status);
+      }
+
       toast('Saved');
       await refreshRoster(student.student_id);
     });

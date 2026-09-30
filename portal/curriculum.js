@@ -213,6 +213,10 @@ async function openBatch(batch) {
                        style="font-family:var(--accent); font-size:.94rem; color:var(--plum);
                               background:transparent; border:1px solid transparent;
                               border-radius:8px; padding:5px 8px; flex:1" />
+                <button class="speedtoggle ${m.tracks_speed ? 'is-on' : ''}" data-speedms="${esc(m.id)}"
+                        title="${m.tracks_speed ? 'Tracked in three speeds' : 'Tracked as one status'}">
+                  ${m.tracks_speed ? '3 speeds' : '1 status'}
+                </button>
                 <button class="iconbtn" data-up="${esc(m.id)}" ${i === 0 ? 'disabled' : ''} title="Move up">↑</button>
                 <button class="iconbtn" data-down="${esc(m.id)}" ${i === withSteps.length - 1 ? 'disabled' : ''} title="Move down">↓</button>
                 ${m.archived
@@ -313,6 +317,20 @@ function wireMilestones(batch, milestones) {
     if (error) return toast(error.message, true);
     reopen();
   };
+
+  // Adavus are learnt speed by speed; hastas are not. Her call, per milestone.
+  for (const button of root.querySelectorAll('[data-speedms]')) {
+    button.addEventListener('click', async () => {
+      const on = !button.classList.contains('is-on');
+      button.disabled = true;
+      const { error } = await sb.from('milestones')
+        .update({ tracks_speed: on }).eq('id', button.dataset.speedms);
+      button.disabled = false;
+      if (error) return toast(error.message, true);
+      toast(on ? 'Now tracked in three speeds' : 'Now a single status');
+      reopen();
+    });
+  }
 
   for (const button of root.querySelectorAll('[data-up]'))
     button.addEventListener('click', () => swap('milestones', milestones, button.dataset.up, -1));

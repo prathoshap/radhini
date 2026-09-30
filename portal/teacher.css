@@ -130,3 +130,55 @@
   margin-top:12px; padding:14px 16px; border-radius:13px;
   background:#fdf4f4; border:1px solid #f0dcdc;
 }
+
+/* ---------- Progress: collapsed overview, speeds on demand ---------- */
+.ms__head{ user-select:none; }
+.ms__chev{
+  color:var(--ink-soft); font-size:1rem; line-height:1; flex:none;
+  transition:transform .18s ease; display:inline-block;
+}
+.ms.is-open .ms__chev{ transform:rotate(90deg); }
+
+.boxes{ display:flex; gap:4px; flex-wrap:wrap; align-items:center; }
+
+/* One box per step on the header; three per step when expanded. */
+.box{
+  width:15px; height:15px; border-radius:4px; flex:none; display:inline-block;
+  border:1.5px solid var(--line); background:var(--white); padding:0;
+}
+.box.is-complete{   background:#5c8a3a; border-color:#4a7030; }
+.box.is-practising{ background:#e3b23c; border-color:#c9922e; }
+.box.is-not_started{ background:var(--white); border-color:#cfc4b8; }
+
+.box--tap{ width:19px; height:19px; cursor:pointer; }
+.box--tap:hover{ box-shadow:0 0 0 3px var(--blush); }
+.box--tap:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+.box--tap:disabled{ opacity:.5; cursor:default; }
+
+.steprow--speed{ grid-template-columns:1fr auto auto; gap:14px; }
+.speedset{ display:flex; align-items:center; gap:6px; }
+.speedlbl{
+  font-size:.66rem; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-soft); margin-right:2px;
+}
+.steplabel{
+  font-size:.7rem; letter-spacing:.06em; text-transform:uppercase;
+  padding:4px 10px; border-radius:999px; min-width:84px; text-align:center;
+}
+.steplabel.is-complete{   background:#eef5e6; color:#2f4a1c; }
+.steplabel.is-practising{ background:#fdf4e3; color:#6d4b0e; }
+.steplabel.is-not_started{ background:var(--cream-2); color:var(--ink-soft); }
+
+@media (max-width:760px){
+  .steprow--speed{ grid-template-columns:1fr; gap:8px; }
+  .steplabel{ justify-self:start; }
+}
+
+/* Per-milestone: three speeds, or one status */
+.speedtoggle{
+  font-family:var(--sans); font-size:.66rem; letter-spacing:.06em;
+  border:1px solid var(--line); background:var(--white); color:var(--ink-soft);
+  border-radius:999px; padding:5px 11px; cursor:pointer; white-space:nowrap;
+}
+.speedtoggle:hover{ border-color:var(--gold); color:var(--plum); }
+.speedtoggle.is-on{ background:var(--blush); border-color:var(--gold); color:var(--maroon); font-weight:500; }

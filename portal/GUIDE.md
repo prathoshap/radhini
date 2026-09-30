@@ -54,6 +54,23 @@ own. The colour is there to let you read a whole batch at a glance.
 Milestones with nothing to tick off — Hasta, Abhinaya, Music and tala —
 have a single dropdown for the milestone as a whole.
 
+### Reading a student at a glance
+
+Each milestone shows one small box per step, straight on its heading —
+green for learnt, amber for progressing, empty for not started. You can see
+a whole batch without opening anything. Click a heading to open it and make
+changes.
+
+### Three speeds
+
+Adavus are learnt speed by speed, so those milestones show three boxes per
+step instead of a dropdown. Click a box to move it on: not started → amber →
+green. The step counts as Learnt once all three speeds are.
+
+You decide which milestones work this way. **Curriculum** → each milestone
+has a small button reading **1 status** or **3 speeds** — click to switch.
+Turn it on for adavus, leave it off for Hasta and Abhinaya.
+
 Below that you can record an assessment — rhythm, precision, coordination,
 and a note the student reads — and award badges.
 
