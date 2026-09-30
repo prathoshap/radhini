@@ -6,9 +6,9 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
 
 const STATUS_LABEL = {
   not_started:         'Not started',
-  practising:          'Practising',
-  awaiting_assessment: 'Assessment needed',
-  complete:            'Complete',
+  practising:          'Progressing',
+  awaiting_assessment: 'Progressing',   // retired in 009; kept for old rows
+  complete:            'Learnt',
 };
 
 let dancers = [];     // every student this login may see
@@ -129,6 +129,7 @@ async function render(student) {
 
   // "current" = first milestone that is not finished
   const currentMilestone = path.find((m) => Number(m.percent_complete) < 100) ?? null;
+  const currentWithSteps  = path.find((m) => Number(m.percent_complete) < 100 && m.total_steps > 0) ?? null;
   $('currentMilestone').textContent = currentMilestone
     ? `${labels.current_prefix ?? 'Currently learning'} · ${currentMilestone.name}`
     : 'All milestones complete';
@@ -153,7 +154,9 @@ async function render(student) {
             <div class="dot">${done ? '✓' : i + 1}</div>
             <div>
               <div class="name">${esc(m.name)}</div>
-              <div class="meta">${m.completed_steps} of ${m.total_steps} steps</div>
+              <div class="meta">${m.total_steps > 0
+                ? m.completed_steps + ' of ' + m.total_steps + ' steps'
+                : esc(STATUS_LABEL[m.milestone_status] ?? 'Not started')}</div>
             </div>
             <div class="badge">${label}</div>
           </div>`;
@@ -176,7 +179,7 @@ async function render(student) {
         </div>`).join('');
 
   await Promise.all([
-    renderTracker(student, currentMilestone),
+    renderTracker(student, currentWithSteps),
     renderAssessment(student, currentMilestone),
   ]);
 

@@ -48,7 +48,17 @@
 .steprow:last-child{ border-bottom:0; }
 .steprow .sname{ font-size:.84rem; }
 .steprow select{ font-family:var(--sans); font-size:.75rem; padding:6px 9px; border:1px solid var(--line); border-radius:9px; background:var(--white); color:var(--ink); }
-.steprow select[data-status="complete"]{ border-color:var(--gold); background:var(--blush); }
+/* Three states, readable at a glance down a long list.
+   Colour is doubled by the word itself, so it still reads without it. */
+.steprow select[data-status="complete"]{
+  border-color:#5c8a3a; background:#eef5e6; color:#2f4a1c; font-weight:500;
+}
+.steprow select[data-status="practising"]{
+  border-color:#c9922e; background:#fdf4e3; color:#6d4b0e; font-weight:500;
+}
+.steprow select[data-status="not_started"]{
+  border-color:var(--line); background:var(--white); color:var(--ink-soft);
+}
 
 .formgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 .field label{ display:block; font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:5px; }

@@ -4,11 +4,12 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+// Radhini's three, in her words. 'awaiting_assessment' is retired —
+// 009 folded anything sitting there into 'practising'.
 const STATUSES = [
-  ['not_started',         'Not started'],
-  ['practising',          'Practising'],
-  ['awaiting_assessment', 'Awaiting assessment'],
-  ['complete',            'Complete'],
+  ['not_started', 'Not started'],
+  ['practising',  'Progressing'],
+  ['complete',    'Learnt'],
 ];
 
 let me       = null;
@@ -136,8 +137,7 @@ async function openStudent(student) {
           <p class="eyebrow">${esc(student.batch_name ?? 'No batch')}</p>
           <h2 style="font-size:1.5rem; color:var(--plum)">${esc(student.full_name)}</h2>
           <p class="muted">${student.steps_complete ?? 0} of ${student.steps_total ?? 0} steps ·
-             ${student.milestones_complete ?? 0}/${student.milestones_total ?? 0} milestones ·
-             ${student.percent_complete ?? 0}% overall</p>
+             ${student.milestones_complete ?? 0} of ${student.milestones_total ?? 0} milestones</p>
         </div>
       </div>
     </div>
@@ -153,7 +153,14 @@ async function openStudent(student) {
           </div>
           <div class="ms__body">
             ${steps.length === 0
-              ? '<p class="muted" style="font-size:.8rem">No steps defined for this milestone yet.</p>'
+              ? `<div class="steprow" style="border-bottom:0">
+                   <span class="sname muted">${esc(milestone.name)} as a whole</span>
+                   <select data-milestone="${esc(milestone.milestone_id)}"
+                           data-status="${esc(milestone.milestone_status ?? 'not_started')}">
+                     ${STATUSES.map(([v, label]) =>
+                       `<option value="${v}"${v === (milestone.milestone_status ?? 'not_started') ? ' selected' : ''}>${label}</option>`).join('')}
+                   </select>
+                 </div>`
               : steps.map((step) => {
                   const status = statusOf.get(step.id) ?? 'not_started';
                   return `
@@ -261,6 +268,31 @@ async function openStudent(student) {
 
 // ---------------------------------------------------------------
 function wireProgress(student) {
+  for (const select of $('detail').querySelectorAll('select[data-milestone]')) {
+    select.addEventListener('change', async () => {
+      const previous = select.dataset.status;
+      const status   = select.value;
+      select.disabled = true;
+
+      const { error } = await sb.from('milestone_status').upsert({
+        student_id:   student.student_id,
+        milestone_id: select.dataset.milestone,
+        status,
+        updated_by:   me.id,
+      }, { onConflict: 'student_id,milestone_id' });
+
+      select.disabled = false;
+      if (error) {
+        select.value = previous;
+        toast('Could not save: ' + error.message, true);
+        return;
+      }
+      select.dataset.status = status;
+      toast('Saved');
+      await refreshRoster(student.student_id);
+    });
+  }
+
   for (const select of $('detail').querySelectorAll('select[data-step]')) {
     select.addEventListener('change', async () => {
       const previous = select.dataset.status;

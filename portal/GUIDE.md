@@ -45,11 +45,14 @@ dropdown to switch between them.
 **Progress** → choose a student → each step has a dropdown:
 
 - *Not started*
-- *Practising*
-- *Awaiting assessment*
-- *Complete*
+- *Progressing* — amber
+- *Learnt* — green
 
-Changes save the moment you choose them. Percentages update on their own.
+Changes save the moment you choose them, and percentages update on their
+own. The colour is there to let you read a whole batch at a glance.
+
+Milestones with nothing to tick off — Hasta, Abhinaya, Music and tala —
+have a single dropdown for the milestone as a whole.
 
 Below that you can record an assessment — rhythm, precision, coordination,
 and a note the student reads — and award badges.
