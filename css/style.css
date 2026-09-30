@@ -394,3 +394,10 @@ a.ccard:hover{ background:rgba(255,255,255,.1); transform:translateY(-4px); }
   *{ animation:none !important; transition:none !important; }
   .reveal,.tile{ opacity:1 !important; transform:none !important; }
 }
+
+/* Sanskrit level name with its English gloss alongside */
+.batch__en{
+  font-family:var(--sans); font-weight:300; font-size:.8em;
+  color:var(--ink-soft); letter-spacing:.01em; margin-left:.45em;
+}
+.batch__en::before{ content:"· "; color:var(--gold); }
