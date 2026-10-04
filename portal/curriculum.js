@@ -46,6 +46,17 @@ function toast(message, isError = false) {
   toast._t = setTimeout(() => { el.className = 'toast'; }, 2600);
 }
 
+// A thrown handler used to fail silently — the button simply did nothing.
+// Surface it instead; a visible complaint beats a dead control.
+window.addEventListener('error', (e) => {
+  console.error(e.error ?? e.message);
+  toast('Something went wrong on this page. ' + (e.message ?? ''), true);
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error(e.reason);
+  toast('Something went wrong: ' + (e.reason?.message ?? e.reason), true);
+});
+
 // A delete that needs two clicks. Cheaper than a modal and, unlike
 // window.confirm, it cannot wedge the page.
 function arm(button, label, action) {

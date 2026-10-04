@@ -52,6 +52,17 @@ function toast(message, isError = false) {
   toast._t = setTimeout(() => { el.className = 'toast'; }, 2600);
 }
 
+// A thrown handler used to fail silently — the button simply did nothing.
+// Surface it instead; a visible complaint beats a dead control.
+window.addEventListener('error', (e) => {
+  console.error(e.error ?? e.message);
+  toast('Something went wrong on this page. ' + (e.message ?? ''), true);
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error(e.reason);
+  toast('Something went wrong: ' + (e.reason?.message ?? e.reason), true);
+});
+
 function arm(button, label, action) {
   button.addEventListener('click', async () => {
     if (button.dataset.armed !== '1') {
@@ -113,21 +124,25 @@ function draw() {
   }
 }
 
+// Read a field that may not be on the page. A renamed or missing input
+// should not take the whole handler down with it.
+const val = (id) => ($(id)?.value ?? '').trim();
+
 async function addStudent() {
-  const full_name = $('nName').value.trim();
+  const full_name = val('nName');
   if (!full_name) return toast('Give the student a name.', true);
 
   const { data, error } = await sb.from('students').insert({
     full_name,
-    contact_email: $('nEmail').value.trim().toLowerCase() || null,
-    batch_id:      $('nBatch').value || null,
+    contact_email: val('nEmail').toLowerCase() || null,
+    batch_id:      val('nBatch') || null,
     joined_on:     new Date().toISOString().slice(0, 10),
   }).select().single();
 
   if (error) return toast(error.message, true);
 
   $('nName').value = '';
-  $('nEmail').value = '';
+  if ($('nEmail')) $('nEmail').value = '';
   toast('Student added');
   await load();
   chosen = students.find((s) => s.id === data.id);
