@@ -190,3 +190,35 @@ a{ color:var(--maroon); }
   padding:9px 0; border-bottom:1px solid var(--cream-2);
 }
 .editrow:last-child{ border-bottom:0; }
+
+/* ---------- Learning path: what is inside each section ---------- */
+.step__main{ min-width:0; }
+.step.is-tappable{ cursor:pointer; border-radius:12px; transition:background .14s ease; }
+.step.is-tappable:hover{ background:var(--cream-2); }
+.step .boxes{ display:flex; gap:4px; flex-wrap:wrap; margin-top:7px; }
+.step .box{
+  width:13px; height:13px; border-radius:3px; display:inline-block; flex:none;
+  border:1.5px solid #cfc4b8; background:var(--white);
+}
+.step .box.is-complete{   background:#5c8a3a; border-color:#4a7030; }
+.step .box.is-practising{ background:#e3b23c; border-color:#c9922e; }
+
+.step__detail{
+  margin:2px 0 10px 44px; padding:12px 15px;
+  background:var(--cream-2); border-radius:13px;
+}
+.substep{
+  display:grid; grid-template-columns:1fr auto auto; gap:12px; align-items:center;
+  padding:7px 0; border-bottom:1px solid rgba(0,0,0,.05);
+}
+.substep:last-child{ border-bottom:0; }
+.substep__name{ font-size:.86rem; }
+.substep__speeds{ display:flex; gap:4px; }
+.substep__speeds .box{ width:14px; height:14px; }
+
+@media (max-width:600px){
+  .step__detail{ margin-left:0; }
+  .substep{ grid-template-columns:1fr auto; }
+  .substep__speeds{ grid-column:2; }
+  .substep .steplabel{ grid-column:1 / -1; justify-self:start; }
+}

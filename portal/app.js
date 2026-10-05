@@ -141,30 +141,6 @@ async function render(student) {
   $('statPractices').textContent  = tally.data?.assignments_done ?? 0;
   $('statBadges').textContent     = (badges.data ?? []).length;
 
-  // ---- learning path
-  $('path').innerHTML = path.length === 0
-    ? '<p class="empty">No curriculum set for this batch yet.</p>'
-    : path.map((m, i) => {
-        const done = Number(m.percent_complete) === 100;
-        const here = !done && m.milestone_id === currentMilestone?.milestone_id;
-        const state = done ? 'is-complete' : here ? 'is-current' : '';
-        const label = done ? 'Complete' : here ? 'In progress' : 'Upcoming';
-        return `
-          <div class="step ${state}">
-            <div class="dot">${done ? '✓' : i + 1}</div>
-            <div>
-              <div class="name">${esc(m.name)}</div>
-              <div class="meta">${m.total_steps > 0
-                ? m.completed_steps + ' of ' + m.total_steps + ' steps'
-                : esc(STATUS_LABEL[m.milestone_status] ?? 'Not started')}</div>
-            </div>
-            <div class="badge">${label}</div>
-          </div>`;
-      }).join('');
-
-  // ---- this week's assignment
-  await renderAssignment(student);
-
   // ---- badges
   $('badgeGrid').innerHTML = (badges.data ?? []).length === 0
     ? `<p class="empty">${esc(labels.empty_badges ?? 'No badges yet — they appear here as you earn them.')}</p>`
@@ -175,6 +151,12 @@ async function render(student) {
           <div class="lbl">${esc(row.badges?.description ?? '')}</div>
         </div>`).join('');
 
+  // ---- learning path, with the detail Radhini sees
+  await renderPath(student, path, currentMilestone);
+
+  // ---- practice / assignment
+  await renderAssignment(student);
+
   await Promise.all([
     renderTracker(student, currentWithSteps),
     renderAssessment(student),
@@ -182,6 +164,91 @@ async function render(student) {
 
   $('loading').hidden = true;
   $('main').hidden = false;
+}
+
+async function renderPath(student, path, currentMilestone) {
+  const ids = path.map((m) => m.milestone_id);
+
+  const [steps, progress, speeds, meta] = await Promise.all([
+    ids.length
+      ? sb.from('steps').select('id, name, milestone_id, sort_order')
+          .in('milestone_id', ids).eq('archived', false).order('sort_order')
+      : Promise.resolve({ data: [] }),
+    sb.from('progress').select('step_id, status').eq('student_id', student.id),
+    sb.from('step_speed').select('step_id, speed, status').eq('student_id', student.id),
+    sb.from('milestones').select('id, tracks_speed').eq('batch_id', student.batch_id),
+  ]);
+
+  const statusOf    = new Map((progress.data ?? []).map((p) => [p.step_id, p.status]));
+  const tracksSpeed = new Map((meta.data ?? []).map((m) => [m.id, m.tracks_speed]));
+
+  const byMilestone = new Map();
+  for (const st of steps.data ?? []) {
+    if (!byMilestone.has(st.milestone_id)) byMilestone.set(st.milestone_id, []);
+    byMilestone.get(st.milestone_id).push(st);
+  }
+
+  const speedOf = new Map();
+  for (const row of speeds.data ?? []) {
+    if (!speedOf.has(row.step_id)) speedOf.set(row.step_id, {});
+    speedOf.get(row.step_id)[row.speed] = row.status;
+  }
+
+  $('path').innerHTML = path.length === 0
+    ? '<p class="empty">No curriculum set for this batch yet.</p>'
+    : path.map((m, i) => {
+        const done = Number(m.percent_complete) === 100;
+        const here = !done && m.milestone_id === currentMilestone?.milestone_id;
+        const state = done ? 'is-complete' : here ? 'is-current' : '';
+        const label = done ? 'Complete' : here ? 'In progress' : 'Upcoming';
+        const mySteps = byMilestone.get(m.milestone_id) ?? [];
+        const speedy  = tracksSpeed.get(m.milestone_id) === true;
+        const stateOf = (id) => statusOf.get(id) ?? 'not_started';
+
+        return `
+          <div class="step ${state}" data-ms="${esc(m.milestone_id)}">
+            <div class="dot">${done ? '✓' : i + 1}</div>
+            <div class="step__main">
+              <div class="name">${esc(m.name)}</div>
+              <div class="meta">${m.total_steps > 0
+                ? m.completed_steps + ' of ' + m.total_steps + ' steps'
+                : esc(STATUS_LABEL[m.milestone_status] ?? 'Not started')}</div>
+              ${mySteps.length === 0 ? '' : `
+                <span class="boxes">
+                  ${mySteps.map((st) => `<i class="box is-${stateOf(st.id)}" title="${esc(st.name)}"></i>`).join('')}
+                </span>`}
+            </div>
+            <div class="badge">${label}</div>
+          </div>
+          ${mySteps.length === 0 ? '' : `
+            <div class="step__detail" data-for="${esc(m.milestone_id)}" hidden>
+              ${mySteps.map((st) => {
+                const stat = stateOf(st.id);
+                const sp = speedOf.get(st.id) ?? {};
+                return `
+                  <div class="substep">
+                    <span class="substep__name">${esc(st.name)}</span>
+                    ${speedy ? `
+                      <span class="substep__speeds">
+                        ${[1, 2, 3].map((n) => `<i class="box is-${sp[n] ?? 'not_started'}"></i>`).join('')}
+                      </span>` : ''}
+                    <span class="steplabel is-${stat}">${esc(STATUS_LABEL[stat])}</span>
+                  </div>`;
+              }).join('')}
+            </div>`}`;
+      }).join('');
+
+  // Tap a milestone to see what is inside it.
+  for (const row of $('path').querySelectorAll('.step[data-ms]')) {
+    const detail = $('path').querySelector(`.step__detail[data-for="${CSS.escape(row.dataset.ms)}"]`);
+    if (!detail) return;
+    row.classList.add('is-tappable');
+    row.addEventListener('click', () => {
+      detail.hidden = !detail.hidden;
+      row.classList.toggle('is-open', !detail.hidden);
+    });
+  }
+
 }
 
 // ---------------------------------------------------------------
