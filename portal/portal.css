@@ -261,3 +261,10 @@ a{ color:var(--maroon); }
   .tstep{ grid-template-columns:1fr auto; }
   .tstep .steplabel{ grid-column:1 / -1; justify-self:start; margin-top:2px; }
 }
+
+/* This week's assignment, sitting directly under the hero on Home */
+.card--assignment{
+  background:linear-gradient(135deg,var(--blush),#fffdfa);
+  border-color:#ecdcd0;
+}
+.card--assignment .section-title{ margin-bottom:10px; }
