@@ -208,3 +208,31 @@
   .picker{ flex-direction:column; align-items:stretch; }
   .picker .muted{ padding-bottom:0; }
 }
+
+/* ---------- Weekly tick list ---------- */
+.ticklist{ display:grid; gap:8px; }
+.tick{
+  display:grid; grid-template-columns:auto 1fr auto; gap:13px; align-items:center;
+  width:100%; text-align:left; cursor:pointer; font-family:var(--sans);
+  border:1px solid var(--line); background:var(--white);
+  border-radius:13px; padding:13px 15px; color:var(--ink);
+  transition:background .14s ease, border-color .14s ease;
+}
+.tick:hover{ border-color:var(--gold); }
+.tick:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+.tick__box{
+  width:26px; height:26px; border-radius:8px; display:grid; place-items:center;
+  border:2px solid #cfc4b8; background:var(--white); font-size:.82rem; color:var(--white);
+}
+.tick__name{ font-size:.95rem; }
+.tick__state{
+  font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft);
+}
+.tick.is-done{ background:#eef5e6; border-color:#5c8a3a; }
+.tick.is-done .tick__box{ background:#5c8a3a; border-color:#4a7030; }
+.tick.is-done .tick__state{ color:#2f4a1c; }
+
+@media (max-width:600px){
+  .tick{ grid-template-columns:auto 1fr; }
+  .tick__state{ grid-column:2; margin-top:-4px; }
+}

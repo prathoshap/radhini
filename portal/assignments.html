@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teacher Console — Kalaashaala</title>
+  <title>Assignments — Kalaashaala</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="icon" type="image/jpeg" href="../assets/img/logo.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,14 +17,12 @@
   <header class="p-header">
     <a class="brand" href="../index.html">
       <img src="../assets/img/logo.jpg" alt="" />
-      <span><b>Kalaashaala</b><span>Teacher Console</span></span>
+      <span><b>Kalaashaala</b><span>Assignments</span></span>
     </a>
     <div class="right">
-      <a class="linkish" href="assignments.html">Assignments</a>
+      <a class="linkish" href="teacher.html">Progress</a>
       <a class="linkish" href="students.html">Students</a>
       <a class="linkish" href="curriculum.html">Curriculum</a>
-      <a class="linkish" href="app.html">Student view</a>
-      <span id="whoami" class="muted" style="color:var(--gold-soft)"></span>
       <button class="linkish" id="signOut">Sign out</button>
     </div>
   </header>
@@ -34,22 +32,17 @@
     <div class="picker">
       <label class="picker__field">
         <span>Batch</span>
-        <select id="batchFilter" aria-label="Filter by batch">
-          <option value="">All batches</option>
-        </select>
+        <select id="batchPick" aria-label="Batch"></select>
       </label>
-      <label class="picker__field picker__field--grow">
-        <span>Student</span>
-        <select id="studentPick" aria-label="Choose a student">
-          <option value="">Choose a student…</option>
-        </select>
+      <label class="picker__field">
+        <span>Week</span>
+        <select id="weekPick" aria-label="Week"></select>
       </label>
-      <span class="muted" id="rosterCount"></span>
+      <span class="muted" id="weekDates"></span>
     </div>
 
-    <!-- ============ Detail ============ -->
-    <section class="detail" id="detail">
-      <div class="card"><p class="empty">Choose a student from the list.</p></div>
+    <section id="detail">
+      <div class="card"><p class="empty">Loading…</p></div>
     </section>
 
   </main>
@@ -57,6 +50,6 @@
   <div class="wrap" id="loading"><p class="muted">Loading…</p></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script type="module" src="teacher.js"></script>
+  <script type="module" src="assignments.js"></script>
 </body>
 </html>

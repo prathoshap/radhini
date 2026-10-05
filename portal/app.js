@@ -106,11 +106,11 @@ async function render(student) {
   $('loading').hidden = false;
   $('main').hidden = true;
 
-  const [summary, milestones, badges, practice] = await Promise.all([
+  const [summary, milestones, badges, tally] = await Promise.all([
     sb.from('student_summary').select('*').eq('student_id', student.id).maybeSingle(),
     sb.from('milestone_progress').select('*').eq('student_id', student.id).order('sort_order'),
     sb.from('student_badges').select('awarded_on, badges ( name, icon, description )').eq('student_id', student.id),
-    sb.from('practice_sessions').select('minutes').eq('student_id', student.id),
+    sb.from('assignment_tally').select('assignments_set, assignments_done').eq('student_id', student.id).maybeSingle(),
   ]);
 
   const s     = summary.data ?? {};
@@ -138,7 +138,7 @@ async function render(student) {
 
   $('statSteps').textContent      = s.steps_complete ?? 0;
   $('statMilestones').textContent = `${s.milestones_complete ?? 0}/${s.milestones_total ?? 0}`;
-  $('statPractices').textContent  = (practice.data ?? []).length;
+  $('statPractices').textContent  = tally.data?.assignments_done ?? 0;
   $('statBadges').textContent     = (badges.data ?? []).length;
 
   // ---- learning path
@@ -162,11 +162,8 @@ async function render(student) {
           </div>`;
       }).join('');
 
-  // ---- practice log
-  const minutes = (practice.data ?? []).reduce((total, r) => total + (r.minutes ?? 0), 0);
-  $('practiceCount').textContent = (practice.data ?? []).length;
-  $('practiceTime').textContent  =
-    minutes >= 60 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m` : `${minutes}m`;
+  // ---- this week's assignment
+  await renderAssignment(student);
 
   // ---- badges
   $('badgeGrid').innerHTML = (badges.data ?? []).length === 0
@@ -185,6 +182,44 @@ async function render(student) {
 
   $('loading').hidden = true;
   $('main').hidden = false;
+}
+
+// ---------------------------------------------------------------
+// What Radhini set for the batch, and whether it is ticked off.
+async function renderAssignment(student) {
+  const { data } = await sb
+    .from('assignment_done')
+    .select('done, assignments ( year, week, task )')
+    .eq('student_id', student.id)
+    .limit(12);
+
+  const weeks = (data ?? [])
+    .filter((r) => r.assignments)
+    .sort((a, b) => b.assignments.year - a.assignments.year || b.assignments.week - a.assignments.week);
+
+  const latest = weeks[0];
+
+  $('practiceCount').textContent = weeks.filter((w) => w.done).length;
+  $('practiceTime').textContent  = latest ? 'Week ' + latest.assignments.week : '—';
+
+  const box = $('assignmentBox');
+  if (!box) return;
+
+  box.innerHTML = !latest
+    ? '<p class="empty">Nothing set yet.</p>'
+    : `
+      <p class="eyebrow">Week ${latest.assignments.week}</p>
+      <p style="font-size:1rem; line-height:1.65; margin:6px 0 12px">${esc(latest.assignments.task)}</p>
+      <span class="steplabel is-${latest.done ? 'complete' : 'not_started'}">${latest.done ? 'Done' : 'Not done yet'}</span>
+      ${weeks.length < 2 ? '' : `
+        <div style="margin-top:18px">
+          ${weeks.slice(1).map((w) => `
+            <div class="editrow" style="grid-template-columns:auto 1fr auto">
+              <span class="muted" style="font-size:.72rem; min-width:62px">Week ${w.assignments.week}</span>
+              <span style="font-size:.82rem">${esc(w.assignments.task)}</span>
+              <span class="steplabel is-${w.done ? 'complete' : 'not_started'}">${w.done ? 'Done' : 'Not done'}</span>
+            </div>`).join('')}
+        </div>`}`;
 }
 
 // ---------------------------------------------------------------

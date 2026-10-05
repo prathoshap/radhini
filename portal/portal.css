@@ -177,3 +177,16 @@ a{ color:var(--maroon); }
   font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold);
 }
 .note-entry p{ margin:6px 0 0; font-size:.95rem; line-height:1.65; }
+
+/* Assignment status, shared with the teacher console's wording */
+.steplabel{
+  display:inline-block; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
+  padding:5px 12px; border-radius:999px;
+}
+.steplabel.is-complete{    background:#eef5e6; color:#2f4a1c; }
+.steplabel.is-not_started{ background:var(--cream-2); color:var(--ink-soft); }
+.editrow{
+  display:grid; gap:10px; align-items:center;
+  padding:9px 0; border-bottom:1px solid var(--cream-2);
+}
+.editrow:last-child{ border-bottom:0; }

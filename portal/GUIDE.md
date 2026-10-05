@@ -78,10 +78,20 @@ Earlier notes are listed underneath as you write them.
 
 You can also award badges there.
 
-## Recording practice
+## Weekly assignments
 
-On the same page, **Practice log**: date, minutes, an optional note. This
-feeds the "Practices" count the student sees.
+**Assignments** in the header. Pick the batch and the week, write what the
+whole batch should practise, then tick off who has done it — one tap each,
+saving as you go.
+
+You write the assignment once, not once per student. The list shows every
+active student in that batch, with a running count at the top.
+
+It opens on the current week. Earlier weeks are in the dropdown if you need
+to catch up.
+
+A student sees the assignment on their own page, with whether they are
+ticked off.
 
 ## Changing the syllabus
 
