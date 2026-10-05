@@ -72,8 +72,11 @@ You decide which milestones work this way. **Curriculum** → each milestone
 has a small button reading **1 status** or **3 speeds** — click to switch.
 Turn it on for adavus, leave it off for Hasta and Abhinaya.
 
-Below that you can record an assessment — rhythm, precision, coordination,
-and a note the student reads — and award badges.
+Below that is **Note to the student** — what went well, what to work on
+next. They read it on their Assessment tab, newest first, with the date.
+Earlier notes are listed underneath as you write them.
+
+You can also award badges there.
 
 ## Recording practice
 

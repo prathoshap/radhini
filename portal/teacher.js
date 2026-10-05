@@ -117,8 +117,9 @@ async function openStudent(student) {
   const [milestones, progress, assessments, badges, awarded, practice] = await Promise.all([
     sb.from('milestone_progress').select('*').eq('student_id', student.student_id).order('sort_order'),
     sb.from('progress').select('step_id, status').eq('student_id', student.student_id),
-    sb.from('assessments').select('id, rhythm, precision_score, coordination, note, assessed_on, milestones ( name )')
-      .eq('student_id', student.student_id).order('assessed_on', { ascending: false }).limit(5),
+    sb.from('assessments').select('id, note, assessed_on')
+      .eq('student_id', student.student_id).not('note', 'is', null)
+      .order('assessed_on', { ascending: false }).limit(5),
     sb.from('badges').select('id, name, icon').order('sort_order'),
     sb.from('student_badges').select('badge_id').eq('student_id', student.student_id),
     sb.from('practice_sessions').select('id, session_date, minutes, note')
@@ -224,40 +225,22 @@ async function openStudent(student) {
     </div>
 
     <div class="card">
-      <h3 class="section-title">Record an assessment</h3>
-      <div class="formgrid">
-        <div class="field">
-          <label for="aRhythm">Rhythm</label>
-          <input id="aRhythm" type="number" min="0" max="100" placeholder="0–100" />
-        </div>
-        <div class="field">
-          <label for="aPrecision">Precision</label>
-          <input id="aPrecision" type="number" min="0" max="100" placeholder="0–100" />
-        </div>
-        <div class="field">
-          <label for="aCoord">Coordination</label>
-          <input id="aCoord" type="number" min="0" max="100" placeholder="0–100" />
-        </div>
+      <h3 class="section-title">Note to the student</h3>
+      <p class="muted" style="margin:-8px 0 14px">
+        What went well, and what to work on next. They read this on their
+        Assessment tab.
+      </p>
+      <div class="field">
+        <textarea id="aNote" placeholder="Good improvement in rhythm. Work on clarity of the final teermanam."></textarea>
       </div>
-      <div class="field" style="margin-top:12px">
-        <label for="aMilestone">Milestone</label>
-        <select id="aMilestone">
-          ${path.map((m) => `<option value="${esc(m.milestone_id)}">${esc(m.name)}</option>`).join('')}
-        </select>
-      </div>
-      <div class="field" style="margin-top:12px">
-        <label for="aNote">Note to the student</label>
-        <textarea id="aNote" placeholder="What went well, and what to work on next."></textarea>
-      </div>
-      <div class="row-end"><button class="btn btn--sm" id="saveAssessment">Save assessment</button></div>
+      <div class="row-end"><button class="btn btn--sm" id="saveAssessment">Save note</button></div>
 
       ${(assessments.data ?? []).length === 0 ? '' : `
-        <h3 class="section-title" style="margin-top:22px">Recent</h3>
+        <h3 class="section-title" style="margin-top:22px">Earlier notes</h3>
         ${assessments.data.map((a) => `
           <div class="teacher-note" style="margin-top:8px">
-            <strong style="font-style:normal">${esc(a.milestones?.name ?? '')}</strong>
-            <span class="muted"> · ${esc(a.assessed_on)}</span><br />
-            ${a.note ? '“' + esc(a.note) + '”' : '<span class="muted">No note</span>'}
+            <span class="muted" style="font-style:normal">${esc(a.assessed_on)}</span><br />
+            “${esc(a.note)}”
           </div>`).join('')}`}
     </div>
 
@@ -443,27 +426,17 @@ function wireProgress(student) {
 
 function wireAssessment(student) {
   $('saveAssessment').addEventListener('click', async () => {
-    const value = (id) => {
-      const raw = $(id).value.trim();
-      return raw === '' ? null : Math.max(0, Math.min(100, Number(raw)));
-    };
+    const note = $('aNote').value.trim();
+    if (!note) return toast('Write something first.', true);
 
-    const row = {
-      student_id:      student.student_id,
-      milestone_id:    $('aMilestone').value,
-      rhythm:          value('aRhythm'),
-      precision_score: value('aPrecision'),
-      coordination:    value('aCoord'),
-      note:            $('aNote').value.trim() || null,
-      assessed_by:     me.id,
-    };
+    const { error } = await sb.from('assessments').insert({
+      student_id:  student.student_id,
+      note,
+      assessed_by: me.id,
+    });
 
-    if (!row.milestone_id) return toast('Pick a milestone first.', true);
-
-    const { error } = await sb.from('assessments').insert(row);
     if (error) return toast('Could not save: ' + error.message, true);
-
-    toast('Assessment saved');
+    toast('Note saved');
     openStudent(student);
   });
 }

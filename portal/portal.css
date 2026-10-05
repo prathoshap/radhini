@@ -123,7 +123,8 @@ a{ color:var(--maroon); }
 .assess .ass{ border:1px solid var(--line); border-radius:13px; padding:13px; }
 .bar{ height:6px; border-radius:6px; background:var(--cream-2); margin-top:9px; overflow:hidden; }
 .bar > i{ display:block; height:100%; background:var(--gold); }
-.teacher-note{ margin-top:12px; padding:13px 15px; border-left:3px solid var(--gold); background:var(--cream-2); font-size:.84rem; font-style:italic; }
+.teacher-note{ margin-top:12px; padding:13px 15px; border-left:3px solid var(--gold); background:var(--cream-2); font-size:.84rem; }
+#assessNote{ font-style:normal; background:transparent; border-left:0; padding:0; margin-top:4px; }
 
 /* ---------- Login ---------- */
 .login{ min-height:100dvh; display:grid; place-items:center; padding:24px; }
@@ -168,3 +169,11 @@ a{ color:var(--maroon); }
 }
 .tile__speeds .box.is-complete{   background:#5c8a3a; border-color:#4a7030; }
 .tile__speeds .box.is-practising{ background:#e3b23c; border-color:#c9922e; }
+
+/* Notes from the teacher, newest first */
+.note-entry{ padding:4px 0 14px; }
+.note-entry + .note-entry{ border-top:1px solid var(--line); padding-top:14px; }
+.note-entry__date{
+  font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold);
+}
+.note-entry p{ margin:6px 0 0; font-size:.95rem; line-height:1.65; }

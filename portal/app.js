@@ -180,7 +180,7 @@ async function render(student) {
 
   await Promise.all([
     renderTracker(student, currentWithSteps),
-    renderAssessment(student, currentMilestone),
+    renderAssessment(student),
   ]);
 
   $('loading').hidden = true;
@@ -243,42 +243,31 @@ async function renderTracker(student, milestone) {
 }
 
 // ---------------------------------------------------------------
-async function renderAssessment(student, milestone) {
+async function renderAssessment(student) {
   const { data } = await sb
     .from('assessments')
-    .select('rhythm, precision_score, coordination, note, assessed_on, milestones ( name )')
+    .select('note, assessed_on')
     .eq('student_id', student.id)
+    .not('note', 'is', null)
     .order('assessed_on', { ascending: false })
-    .limit(1);
+    .limit(10);
 
-  const latest = data?.[0];
+  const notes = data ?? [];
 
-  if (!latest) {
-    $('assessTitle').textContent = 'No assessment yet';
-    $('assessBars').innerHTML = '<p class="empty">Your teacher’s assessment will appear here.</p>';
+  if (notes.length === 0) {
+    $('assessTitle').textContent = 'Nothing yet';
+    $('assessBars').innerHTML =
+      '<p class="empty">Notes from Radhini will appear here after your classes.</p>';
     $('assessNote').hidden = true;
     return;
   }
 
-  $('assessTitle').textContent = latest.milestones?.name ?? milestone?.name ?? '';
-
-  const rows = [
-    ['Rhythm',       latest.rhythm],
-    ['Precision',    latest.precision_score],
-    ['Coordination', latest.coordination],
-  ];
-
-  $('assessBars').innerHTML = rows.map(([label, value]) => `
-    <div class="ass">
-      <strong style="font-size:.82rem; font-weight:500">${label}</strong>
-      <div class="bar"><i style="width:${Number(value ?? 0)}%"></i></div>
-      <div class="muted" style="font-size:.72rem">${value == null ? 'Not scored' : value + '%'}</div>
+  $('assessTitle').textContent = notes.length === 1 ? 'From Radhini' : 'Notes from Radhini';
+  $('assessBars').innerHTML = '';
+  $('assessNote').hidden = false;
+  $('assessNote').innerHTML = notes.map((n) => `
+    <div class="note-entry">
+      <span class="note-entry__date">${esc(n.assessed_on)}</span>
+      <p>“${esc(n.note)}”</p>
     </div>`).join('');
-
-  if (latest.note) {
-    $('assessNote').hidden = false;
-    $('assessNote').innerHTML = `“${esc(latest.note)}”`;
-  } else {
-    $('assessNote').hidden = true;
-  }
 }
