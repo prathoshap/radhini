@@ -11,7 +11,8 @@
   --line:#e7dbd0;
   --serif:"Cormorant Garamond",Georgia,serif;
   --accent:"Marcellus",Georgia,serif;
-  --sans:"Jost",system-ui,sans-serif;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --num:"Inter",system-ui,sans-serif;   /* lining, tabular figures */
   --maxw:1080px;
   --shadow:0 24px 60px -32px rgba(52,26,46,.42);
   --radius:18px;
@@ -19,9 +20,10 @@
 
 *,*::before,*::after{ box-sizing:border-box; }
 body{
-  margin:0; font-family:var(--sans); font-weight:300;
-  color:var(--ink); background:var(--cream); line-height:1.7;
-  -webkit-font-smoothing:antialiased;
+  margin:0; font-family:var(--sans); font-weight:400;
+  color:var(--ink); background:var(--cream); line-height:1.65;
+  font-size:15.5px; letter-spacing:-0.004em;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
 }
 h1,h2,h3{ font-family:var(--serif); font-weight:500; margin:0; line-height:1.2; }
 a{ color:var(--maroon); }
@@ -77,7 +79,11 @@ a{ color:var(--maroon); }
 /* ---------- Stats ---------- */
 .stats{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .stat{ background:var(--cream-2); border-radius:13px; padding:13px; }
-.stat .num{ font-family:var(--serif); font-size:1.7rem; color:var(--plum); line-height:1.1; }
+.stat .num{
+  font-family:var(--num); font-size:1.55rem; font-weight:600; color:var(--plum);
+  line-height:1.15; font-variant-numeric:tabular-nums lining-nums;
+  letter-spacing:-0.02em;
+}
 .stat .lbl{ font-size:.66rem; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-soft); }
 
 /* ---------- Tabs ---------- */
@@ -268,3 +274,20 @@ a{ color:var(--maroon); }
   border-color:#ecdcd0;
 }
 .card--assignment .section-title{ margin-bottom:10px; }
+
+
+/* ---------- Typography ----------
+   Cormorant stays on the display headings, where its old-style figures
+   never appear. Everything that carries a number or has to be read
+   quickly uses Inter with tabular lining figures — "1" should look like
+   a one, not a small-caps I. */
+.ring::after,
+.ms__pct, .tsec__count, .pc, .tick__state,
+.roster__count, .num, .event__val{
+  font-family:var(--num); font-variant-numeric:tabular-nums lining-nums;
+}
+.muted{ font-size:.86rem; line-height:1.6; }
+.name, .sname, .tstep__name, .substep__name{ font-weight:450; }
+.steplabel, .badge, .eyebrow, .lbl{ font-weight:500; }
+h1,h2,h3{ letter-spacing:-0.01em; }
+input, select, textarea, button{ font-family:var(--sans); }
