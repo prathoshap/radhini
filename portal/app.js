@@ -152,13 +152,14 @@ async function render(student) {
         </div>`).join('');
 
   // ---- learning path, with the detail Radhini sees
-  await renderPath(student, path, currentMilestone);
+  const cur = await loadCurriculum(student, path);
+  renderPath(student, path, currentMilestone, cur);
 
   // ---- practice / assignment
   await renderAssignment(student);
 
   await Promise.all([
-    renderTracker(student, currentWithSteps),
+    renderTracker(student, path, currentWithSteps, cur),
     renderAssessment(student),
   ]);
 
@@ -166,7 +167,9 @@ async function render(student) {
   $('main').hidden = false;
 }
 
-async function renderPath(student, path, currentMilestone) {
+// Steps, statuses and speeds for the whole batch. Loaded once so the
+// path and the tracker can never disagree with each other.
+async function loadCurriculum(student, path) {
   const ids = path.map((m) => m.milestone_id);
 
   const [steps, progress, speeds, meta] = await Promise.all([
@@ -179,9 +182,6 @@ async function renderPath(student, path, currentMilestone) {
     sb.from('milestones').select('id, tracks_speed').eq('batch_id', student.batch_id),
   ]);
 
-  const statusOf    = new Map((progress.data ?? []).map((p) => [p.step_id, p.status]));
-  const tracksSpeed = new Map((meta.data ?? []).map((m) => [m.id, m.tracks_speed]));
-
   const byMilestone = new Map();
   for (const st of steps.data ?? []) {
     if (!byMilestone.has(st.milestone_id)) byMilestone.set(st.milestone_id, []);
@@ -193,6 +193,17 @@ async function renderPath(student, path, currentMilestone) {
     if (!speedOf.has(row.step_id)) speedOf.set(row.step_id, {});
     speedOf.get(row.step_id)[row.speed] = row.status;
   }
+
+  return {
+    byMilestone,
+    speedOf,
+    statusOf:    new Map((progress.data ?? []).map((p) => [p.step_id, p.status])),
+    tracksSpeed: new Map((meta.data ?? []).map((m) => [m.id, m.tracks_speed])),
+  };
+}
+
+function renderPath(student, path, currentMilestone, cur) {
+  const { byMilestone, speedOf, statusOf, tracksSpeed } = cur;
 
   $('path').innerHTML = path.length === 0
     ? '<p class="empty">No curriculum set for this batch yet.</p>'
@@ -290,58 +301,75 @@ async function renderAssignment(student) {
 }
 
 // ---------------------------------------------------------------
-async function renderTracker(student, milestone) {
-  if (!milestone) {
-    $('trackerTitle').textContent = 'Nothing in progress';
-    $('stepGrid').innerHTML = '<p class="empty">Every milestone is complete. Wonderful.</p>';
+// Every section, not just the one in progress. A student should be able
+// to see where they stand on all of it.
+function renderTracker(student, path, current, cur) {
+  const { byMilestone, speedOf, statusOf, tracksSpeed } = cur;
+
+  if (path.length === 0) {
+    $('trackerTitle').textContent = 'Nothing set yet';
+    $('stepGrid').innerHTML = '<p class="empty">Your teacher has not set up the syllabus yet.</p>';
     $('trackerNote').hidden = true;
     return;
   }
 
-  $('trackerTitle').textContent = milestone.name;
+  $('trackerTitle').textContent = current ? current.name : 'Everything so far';
 
-  // Steps and progress come back separately — progress rows only exist once
-  // the teacher has touched a step, so anything missing is "not started".
-  const [steps, progress, meta, speeds] = await Promise.all([
-    sb.from('steps').select('id, name, note, sort_order')
-      .eq('milestone_id', milestone.milestone_id).eq('archived', false).order('sort_order'),
-    sb.from('progress').select('step_id, status').eq('student_id', student.id),
-    sb.from('milestones').select('tracks_speed').eq('id', milestone.milestone_id).maybeSingle(),
-    sb.from('step_speed').select('step_id, speed, status').eq('student_id', student.id),
-  ]);
+  $('stepGrid').innerHTML = path.map((m) => {
+    const steps  = byMilestone.get(m.milestone_id) ?? [];
+    const speedy = tracksSpeed.get(m.milestone_id) === true;
+    const here   = current && m.milestone_id === current.milestone_id;
 
-  const statusOf = new Map((progress.data ?? []).map((p) => [p.step_id, p.status]));
-  const speedy   = meta.data?.tracks_speed === true;
+    // A section with no steps carries a status of its own.
+    if (steps.length === 0) {
+      const st = m.milestone_status ?? 'not_started';
+      return `
+        <section class="tsec ${here ? 'is-here' : ''}">
+          <header class="tsec__head">
+            <h4>${esc(m.name)}</h4>
+            <span class="steplabel is-${st}">${esc(STATUS_LABEL[st])}</span>
+          </header>
+        </section>`;
+    }
 
-  const speedOf = new Map();
-  for (const row of speeds.data ?? []) {
-    if (!speedOf.has(row.step_id)) speedOf.set(row.step_id, {});
-    speedOf.get(row.step_id)[row.speed] = row.status;
-  }
+    const learnt = steps.filter((x) => (statusOf.get(x.id) ?? 'not_started') === 'complete').length;
 
-  $('stepGrid').innerHTML = (steps.data ?? []).map((step, i) => {
-    const status = statusOf.get(step.id) ?? 'not_started';
-    const done   = status === 'complete';
-    const sp     = speedOf.get(step.id) ?? {};
     return `
-      <div class="tile ${done ? 'is-complete' : ''}">
-        <div class="mark">${done ? '✓' : i + 1}</div>
-        <b>${esc(step.name)}</b>
-        <span>${esc(step.note || STATUS_LABEL[status])}</span>
-        ${speedy ? `
-          <span class="tile__speeds" aria-label="Speeds learnt">
-            ${[1, 2, 3].map((n) => `<i class="box is-${sp[n] ?? 'not_started'}"></i>`).join('')}
-          </span>` : ''}
-      </div>`;
+      <section class="tsec ${here ? 'is-here' : ''}">
+        <header class="tsec__head">
+          <h4>${esc(m.name)}</h4>
+          <span class="tsec__count">${learnt} of ${steps.length} learnt</span>
+        </header>
+        <div class="tsec__steps">
+          ${steps.map((step) => {
+            const st = statusOf.get(step.id) ?? 'not_started';
+            const sp = speedOf.get(step.id) ?? {};
+            return `
+              <div class="tstep is-${st}">
+                <span class="tstep__name">${esc(step.name)}</span>
+                ${speedy ? `
+                  <span class="tstep__speeds" title="First, second and third speed">
+                    ${[1, 2, 3].map((n) => `<i class="box is-${sp[n] ?? 'not_started'}"></i>`).join('')}
+                  </span>` : ''}
+                <span class="steplabel is-${st}">${esc(STATUS_LABEL[st])}</span>
+              </div>`;
+          }).join('')}
+        </div>
+      </section>`;
   }).join('');
 
-  const remaining = milestone.total_steps - milestone.completed_steps;
+  const totalSteps = path.reduce((n, m) => n + (byMilestone.get(m.milestone_id) ?? []).length, 0);
+  const totalDone  = path.reduce((n, m) =>
+    n + (byMilestone.get(m.milestone_id) ?? [])
+          .filter((x) => (statusOf.get(x.id) ?? 'not_started') === 'complete').length, 0);
+
   $('trackerNote').hidden = false;
-  $('trackerNote').innerHTML =
-    `<strong>${milestone.completed_steps} of ${milestone.total_steps} complete.</strong> ` +
-    (remaining === 0
-      ? 'Ready for your teacher’s final assessment.'
-      : `${remaining} to go before the next milestone unlocks.`);
+  $('trackerNote').innerHTML = totalSteps === 0
+    ? '<strong>Nothing to tick off yet.</strong>'
+    : `<strong>${totalDone} of ${totalSteps} learnt across every section.</strong> ` +
+      (totalDone === totalSteps
+        ? 'Every one of them. Wonderful.'
+        : 'Amber means you are working on it; green means your teacher has marked it learnt.');
 }
 
 // ---------------------------------------------------------------

@@ -107,7 +107,7 @@ a{ color:var(--maroon); }
 .step.is-current  .badge{ background:var(--plum); color:var(--cream); }
 
 /* ---------- Step grid ---------- */
-.step-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:9px; }
+.step-grid{ display:block; }
 .tile{ border:1px solid var(--line); border-radius:13px; padding:12px; background:var(--white); min-height:78px; }
 .tile.is-complete{ background:var(--blush); }
 .tile .mark{ float:right; width:20px; height:20px; border-radius:50%; background:var(--cream-2); display:grid; place-items:center; font-size:.64rem; }
@@ -221,4 +221,43 @@ a{ color:var(--maroon); }
   .substep{ grid-template-columns:1fr auto; }
   .substep__speeds{ grid-column:2; }
   .substep .steplabel{ grid-column:1 / -1; justify-self:start; }
+}
+
+/* ---------- Tracker: every section, with where you stand ---------- */
+.tsec{ margin-bottom:16px; }
+.tsec:last-child{ margin-bottom:0; }
+.tsec__head{
+  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+  padding-bottom:9px; border-bottom:1px solid var(--line); margin-bottom:10px;
+}
+.tsec__head h4{
+  margin:0; font-family:var(--accent); font-weight:400;
+  font-size:1rem; color:var(--plum);
+}
+.tsec__count{ font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); }
+.tsec.is-here .tsec__head{ border-bottom-color:var(--gold); }
+.tsec.is-here .tsec__head h4::after{
+  content:"· now"; color:var(--gold); font-family:var(--sans);
+  font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; margin-left:8px;
+}
+
+.tsec__steps{ display:grid; gap:7px; }
+.tstep{
+  display:grid; grid-template-columns:1fr auto auto; gap:12px; align-items:center;
+  padding:11px 14px; border:1px solid var(--line); border-radius:12px; background:var(--white);
+}
+.tstep.is-complete{   background:#f6faf2; border-color:#cfe0bf; }
+.tstep.is-practising{ background:#fffaf0; border-color:#ecd9ac; }
+.tstep__name{ font-size:.9rem; }
+.tstep__speeds{ display:flex; gap:4px; }
+.tstep__speeds .box{
+  width:14px; height:14px; border-radius:3px; display:inline-block;
+  border:1.5px solid #cfc4b8; background:var(--white);
+}
+.tstep__speeds .box.is-complete{   background:#5c8a3a; border-color:#4a7030; }
+.tstep__speeds .box.is-practising{ background:#e3b23c; border-color:#c9922e; }
+
+@media (max-width:600px){
+  .tstep{ grid-template-columns:1fr auto; }
+  .tstep .steplabel{ grid-column:1 / -1; justify-self:start; margin-top:2px; }
 }
